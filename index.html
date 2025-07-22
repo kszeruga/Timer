@@ -38,31 +38,43 @@
 <body>
   <div id="timer">40</div>
 
-  <script>
-    const START_TIME = 40;
-    let countdown = START_TIME;
-    let intervalId;
-    const timerElement = document.getElementById('timer');
+<script>
+  const START_TIME = 40;
+  let countdown = START_TIME;
+  let intervalId;
+  let rotation = 0; // Track accumulated rotation
 
-    function startCountdown() {
-      clearInterval(intervalId);
-      countdown = START_TIME;
+  // Define your color values here
+  const colors = ['#333', '#e74c3c', '#2980b9', '#27ae60'];
+  let colorIndex = 0;
+
+  const timerElement = document.getElementById('timer');
+
+  function startCountdown() {
+    clearInterval(intervalId);
+    countdown = START_TIME;
+    timerElement.textContent = countdown;
+
+    // Accumulate rotation by 90 degrees each reset
+    rotation = (rotation + 90) % 360;
+    timerElement.style.transform = `rotate(${rotation}deg)`;
+    timerElement.style.transition = 'transform 0.3s ease';
+
+    // Cycle text color through 4 values
+    colorIndex = (colorIndex + 1) % colors.length;
+    timerElement.style.color = colors[colorIndex];
+
+    intervalId = setInterval(() => {
+      countdown--;
       timerElement.textContent = countdown;
-    
-      // Toggle rotation
-      timerElement.classList.toggle('rotated');
-    
-      intervalId = setInterval(() => {
-        countdown--;
-        timerElement.textContent = countdown;
-        if (countdown <= 0) {
-          clearInterval(intervalId);
-        }
-      }, 1000);
-    }
+      if (countdown <= 0) {
+        clearInterval(intervalId);
+      }
+    }, 1000);
+  }
 
-    startCountdown();
-    document.body.addEventListener('click', startCountdown);
-  </script>
+  startCountdown();
+  document.body.addEventListener('click', startCountdown);
+</script>
 </body>
 </html>
