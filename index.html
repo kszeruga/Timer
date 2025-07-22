@@ -1,0 +1,33 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Simple Timer</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 100px;
+    }
+    #timer {
+      font-size: 48px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simple Timer</h1>
+  <div id="timer">0</div>
+
+  <script>
+    let seconds = 0;
+    const timerElement = document.getElementById('timer');
+    setInterval(() => {
+      seconds++;
+      timerElement.textContent = seconds;
+    }, 1000);
+  </script>
+</body>
+</html>
