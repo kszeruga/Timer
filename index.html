@@ -1,33 +1,56 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Simple Timer</title>
+  <title>Countdown Timer</title>
   <style>
     body {
       font-family: sans-serif;
       text-align: center;
       margin-top: 100px;
+      cursor: pointer;
     }
     #timer {
       font-size: 48px;
       color: #333;
     }
+    p {
+      color: #777;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
-  <h1>Simple Timer</h1>
-  <div id="timer">0</div>
+  <h1>Countdown Timer</h1>
+  <div id="timer">40</div>
+  <p>(Click anywhere to reset)</p>
 
   <script>
-    let seconds = 0;
+    let countdown = 40;
+    let intervalId;
+
     const timerElement = document.getElementById('timer');
-    setInterval(() => {
-      seconds++;
-      timerElement.textContent = seconds;
-    }, 1000);
+
+    function startCountdown() {
+      clearInterval(intervalId);
+      countdown = 40;
+      timerElement.textContent = countdown;
+
+      intervalId = setInterval(() => {
+        countdown--;
+        timerElement.textContent = countdown;
+        if (countdown <= 0) {
+          clearInterval(intervalId);
+        }
+      }, 1000);
+    }
+
+    // Start when page loads
+    startCountdown();
+
+    // Reset on any click
+    document.body.addEventListener('click', startCountdown);
   </script>
 </body>
 </html>
