@@ -47,4 +47,27 @@
     let countdown = 40;
     let intervalId;
 
-    con
+    const timerElement = document.getElementById('timer');
+
+    function startCountdown() {
+      clearInterval(intervalId);
+      countdown = 40;
+      timerElement.textContent = countdown;
+
+      intervalId = setInterval(() => {
+        countdown--;
+        timerElement.textContent = countdown;
+        if (countdown <= 0) {
+          clearInterval(intervalId);
+        }
+      }, 1000);
+    }
+
+    // Start on load
+    startCountdown();
+
+    // Reset on any click
+    document.body.addEventListener('click', startCountdown);
+  </script>
+</body>
+</html>
