@@ -29,6 +29,10 @@
       font-size: 20vw; /* scale to screen width */
       color: #333;
     }
+   .rotated {
+      transform: rotate(90deg);
+      transition: transform 0.3s ease;
+    } 
   </style>
 </head>
 <body>
@@ -44,7 +48,10 @@
       clearInterval(intervalId);
       countdown = START_TIME;
       timerElement.textContent = countdown;
-
+    
+      // Toggle rotation
+      timerElement.classList.toggle('rotated');
+    
       intervalId = setInterval(() => {
         countdown--;
         timerElement.textContent = countdown;
