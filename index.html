@@ -5,16 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Countdown Timer</title>
   <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
     body {
-      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
       text-align: center;
-      margin-top: 100px;
+      font-family: sans-serif;
       cursor: pointer;
     }
+
+    .container {
+      width: 80%;
+    }
+
     #timer {
       font-size: 48px;
       color: #333;
     }
+
     p {
       color: #777;
       font-size: 14px;
@@ -22,35 +37,14 @@
   </style>
 </head>
 <body>
-  <h1>Countdown Timer</h1>
-  <div id="timer">40</div>
-  <p>(Click anywhere to reset)</p>
+  <div class="container">
+    <h1>Countdown Timer</h1>
+    <div id="timer">40</div>
+    <p>(Click anywhere to reset)</p>
+  </div>
 
   <script>
     let countdown = 40;
     let intervalId;
 
-    const timerElement = document.getElementById('timer');
-
-    function startCountdown() {
-      clearInterval(intervalId);
-      countdown = 40;
-      timerElement.textContent = countdown;
-
-      intervalId = setInterval(() => {
-        countdown--;
-        timerElement.textContent = countdown;
-        if (countdown <= 0) {
-          clearInterval(intervalId);
-        }
-      }, 1000);
-    }
-
-    // Start when page loads
-    startCountdown();
-
-    // Reset on any click
-    document.body.addEventListener('click', startCountdown);
-  </script>
-</body>
-</html>
+    con
