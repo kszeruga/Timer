@@ -61,7 +61,7 @@
     rotation = rotation + 90;
     timerElement.style.transform = `rotate(${rotation}deg)`;
     timerElement.style.transition = 'transform 0.3s ease';
-    rotation = rotation % 360;
+
     // Cycle text color through 4 values
     colorIndex = (colorIndex + 1) % colors.length;
     timerElement.style.color = colors[colorIndex];
