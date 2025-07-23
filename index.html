@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,8 +38,7 @@
 </head>
 <body>
   <div id="timer">40</div>
-<audio id="tick-sound" src="tick.mp3" preload="auto"></audio>
-<audio id="gong-sound" src="gong.mp3" preload="auto"></audio>
+
 <script>
   const START_TIME = 40;
   let countdown = START_TIME;
@@ -52,34 +52,26 @@
   const timerElement = document.getElementById('timer');
 
   function startCountdown() {
-const tickSound = document.getElementById('tick-sound');
-const gongSound = document.getElementById('gong-sound');
-
-function startCountdown() {
-  clearInterval(intervalId);
-  countdown = START_TIME;
-  timerElement.textContent = countdown;
-
-  // Rotation and color cycling code here...
-
-  intervalId = setInterval(() => {
-    countdown--;
+    clearInterval(intervalId);
+    countdown = START_TIME;
     timerElement.textContent = countdown;
 
-    // Play tick in last 5 seconds
-    if (countdown > 0 && countdown <= 5) {
-      tickSound.currentTime = 0;
-      tickSound.play();
-    }
+    // Accumulate rotation by 90 degrees each reset
+    rotation = (rotation + 90) % 360;
+    timerElement.style.transform = `rotate(${rotation}deg)`;
+    timerElement.style.transition = 'transform 0.3s ease';
 
-    // Play gong at zero
-    if (countdown === 0) {
-      gongSound.currentTime = 0;
-      gongSound.play();
-      clearInterval(intervalId);
-    }
-  }, 1000);
-}
+    // Cycle text color through 4 values
+    colorIndex = (colorIndex + 1) % colors.length;
+    timerElement.style.color = colors[colorIndex];
+
+    intervalId = setInterval(() => {
+      countdown--;
+      timerElement.textContent = countdown;
+      if (countdown <= 0) {
+        clearInterval(intervalId);
+      }
+    }, 1000);
   }
 
   startCountdown();
