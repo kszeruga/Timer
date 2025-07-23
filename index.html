@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Countdown Timer 1.8</title>
+  <title>Countdown Timer 1.9</title>
   <style>
     html, body {
       margin: 0;
@@ -49,6 +49,36 @@
     const colors = ['#333', '#e74c3c', '#2980b9', '#27ae60'];
     let colorIndex = 0;
     const timerElement = document.getElementById('timer');
+    function setupLongPressPause() {
+      let lastTouchTime = 0;
+    
+      function startLongPressTimer(e) {
+        lastTouchTime = Date.now();
+        longPressTimeout = setTimeout(() => {
+          isPaused = !isPaused;
+          timerElement.style.opacity = isPaused ? 0.5 : 1;
+        }, 500);
+      }
+    
+      function cancelLongPress(e) {
+        clearTimeout(longPressTimeout);
+        const duration = Date.now() - lastTouchTime;
+        if (duration < 500) {
+          startCountdown(); // treat as short tap
+        }
+      }
+    
+      // Mouse (desktop)
+      document.body.addEventListener('mousedown', startLongPressTimer);
+      document.body.addEventListener('mouseup', cancelLongPress);
+      document.body.addEventListener('mouseleave', cancelLongPress);
+    
+      // Touch (mobile)
+      document.body.addEventListener('touchstart', startLongPressTimer);
+      document.body.addEventListener('touchend', cancelLongPress);
+      document.body.addEventListener('touchcancel', cancelLongPress);
+    }
+
 
     function startCountdown() {
       clearInterval(intervalId);
@@ -79,6 +109,7 @@
 
     // Start initially
     startCountdown();
+    setupLongPressPause();
 
     // Handle long press for pause
     document.body.addEventListener('mousedown', () => {
