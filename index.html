@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Countdown Timer 1.6</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Countdown Timer 1.7</title>
   <style>
     html, body {
       margin: 0;
@@ -17,6 +17,8 @@
       cursor: pointer;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      background-color: white;
     }
 
     #timer {
@@ -24,13 +26,14 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) rotate(0deg);
-      font-size: 20vw;
+      font-size: 20vmin; /* Better for mobile */
       color: #333;
       transition: color 0.2s ease, transform 0.3s ease;
       user-select: none;
     }
   </style>
 </head>
+
 <body>
   <div id="timer">40</div>
 
