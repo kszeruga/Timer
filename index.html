@@ -235,7 +235,7 @@
             }
         }
 
-        function handlePressStart() {
+        function handlePressStart(e) {
             lastPressTime = Date.now();
             longPressTimeout = setTimeout(() => {
                 handleLongPress();
@@ -243,10 +243,19 @@
             }, 500);
         }
 
-        function handlePressEnd() {
+        function handlePressEnd(e) {
+            // Prevent short press from affecting optionsBtn/optionsPanel
             if (longPressTimeout) {
                 clearTimeout(longPressTimeout);
                 longPressTimeout = null;
+                // If the event target is the options button or inside the options panel, do nothing
+                if (
+                    e.target === optionsBtn ||
+                    optionsPanel.contains(e.target)
+                ) {
+                    return;
+                }
+                // Short press: restart timer
                 if (Date.now() - lastPressTime < 500) {
                     startCountdown();
                 }
@@ -261,21 +270,28 @@
         // Touch event listeners (for mobile)
         document.body.addEventListener('touchstart', function (e) {
             e.preventDefault();
-            handlePressStart();
+            handlePressStart(e);
         }, { passive: false });
         document.body.addEventListener('touchend', function (e) {
             e.preventDefault();
-            handlePressEnd();
+            handlePressEnd(e);
         }, { passive: false });
         document.body.addEventListener('touchcancel', function (e) {
             e.preventDefault();
-            handlePressEnd();
+            handlePressEnd(e);
         }, { passive: false });
 
         // Options button logic
-        optionsBtn.addEventListener('click', function () {
+        optionsBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
             optionsPanel.classList.toggle("show");
         });
+
+        optionsBtn.addEventListener('touchend', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            optionsPanel.classList.toggle("show");
+        }, { passive: false });
 
         // Interval input logic
         intervalInput.addEventListener('change', function () {
