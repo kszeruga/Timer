@@ -1,123 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Countdown Timer 2.0</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-    }
-    body {
-      font-family: sans-serif;
-      cursor: pointer;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-      background-color: white;
-    }
-    #timer {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(0deg);
-      font-size: 80vmin; /* Better for mobile */
-      color: #333;
-      transition: color 0.2s ease, transform 0.3s ease;
-      user-select: none;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Countdown Timer 2.0</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: sans-serif;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            background-color: white;
+        }
+
+        #timer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(0deg);
+            font-size: 80vmin; /* Better for mobile */
+            color: #333;
+            transition: color 0.2s ease, transform 0.3s ease;
+            user-select: none;
+        }
+    </style>
 </head>
 <body>
-  <div id="timer">40</div>
-  <script>
-    const START_TIME = 40;
-    let countdown = START_TIME;
-    let intervalId;
-    let rotation = 0;
-    let isPaused = false;
-    let longPressTimeout;
-    let lastPressTime = 0;
+    <div id="timer">40</div>
+    <!-- Preload sounds -->
+    <audio id="tickSound" src="sounds/tick.mp3" preload="auto"></audio>
+    <audio id="gongSound" src="sounds/gong.mp3" preload="auto"></audio>
+    <script>
+        const START_TIME = 40;
+        let countdown = START_TIME;
+        let intervalId;
+        let rotation = 0;
+        let isPaused = false;
+        let longPressTimeout;
+        let lastPressTime = 0;
 
-    const colors = ['#333', '#e74c3c', '#2980b9', '#27ae60'];
-    let colorIndex = 0;
-    const timerElement = document.getElementById('timer');
+        const colors = ['#333', '#e74c3c', '#2980b9', '#27ae60'];
+        let colorIndex = 0;
+        const timerElement = document.getElementById('timer');
+        const tickSound = document.getElementById('tickSound');
+        const gongSound = document.getElementById('gongSound');
 
-    function startCountdown() {
-      clearInterval(intervalId);
-      countdown = START_TIME;
-      timerElement.textContent = countdown;
-
-      rotation += 90;
-      timerElement.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
-
-      colorIndex = (colorIndex + 1) % colors.length;
-      timerElement.style.color = colors[colorIndex];
-
-      isPaused = false;
-      timerElement.style.opacity = 1;
-
-      intervalId = setInterval(tick, 1000);
-    }
-
-    function tick() {
-      if (!isPaused) {
-        countdown--;
-        timerElement.textContent = countdown;
-        if (countdown <= 0) {
-          clearInterval(intervalId);
+        function playTick() {
+            tickSound.currentTime = 0;
+            tickSound.play();
         }
-      }
-    }
 
-    // Start initially
-    startCountdown();
-
-    function handleLongPress() {
-      isPaused = !isPaused;
-      timerElement.style.opacity = isPaused ? 0.5 : 1;
-    }
-
-    function handlePressStart() {
-      lastPressTime = Date.now();
-      longPressTimeout = setTimeout(() => {
-        handleLongPress();
-        longPressTimeout = null;
-      }, 500); // 500ms threshold for long press
-    }
-
-    function handlePressEnd() {
-      if (longPressTimeout) {
-        clearTimeout(longPressTimeout);
-        longPressTimeout = null;
-        // Short press: restart timer
-        if (Date.now() - lastPressTime < 500) {
-          startCountdown();
+        function playGong() {
+            gongSound.currentTime = 0;
+            gongSound.play();
         }
-      }
-    }
 
-    // Mouse event listeners
-    document.body.addEventListener('mousedown', handlePressStart);
-    document.body.addEventListener('mouseup', handlePressEnd);
-    document.body.addEventListener('mouseleave', handlePressEnd);
+        function startCountdown() {
+            clearInterval(intervalId);
+            countdown = START_TIME;
+            timerElement.textContent = countdown;
 
-    // Touch event listeners (for mobile)
-    document.body.addEventListener('touchstart', function(e) {
-      e.preventDefault();
-      handlePressStart();
-    }, {passive: false});
-    document.body.addEventListener('touchend', function(e) {
-      e.preventDefault();
-      handlePressEnd();
-    }, {passive: false});
-    document.body.addEventListener('touchcancel', function(e) {
-      e.preventDefault();
-      handlePressEnd();
-    }, {passive: false});
-  </script>
+            rotation += 90;
+            timerElement.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+
+            colorIndex = (colorIndex + 1) % colors.length;
+            timerElement.style.color = colors[colorIndex];
+
+            isPaused = false;
+            timerElement.style.opacity = 1;
+
+            intervalId = setInterval(tick, 1000);
+        }
+
+        function tick() {
+            if (!isPaused) {
+                countdown--;
+                timerElement.textContent = countdown;
+                if (countdown <= 5 && countdown > 0) {
+                    playTick();
+                }
+                if (countdown <= 0) {
+                    clearInterval(intervalId);
+                    timerElement.textContent = 0;
+                    playGong();
+                }
+            }
+        }
+
+        // Start initially
+        startCountdown();
+
+        function handleLongPress() {
+            isPaused = !isPaused;
+            timerElement.style.opacity = isPaused ? 0.5 : 1;
+        }
+
+        function handlePressStart() {
+            lastPressTime = Date.now();
+            longPressTimeout = setTimeout(() => {
+                handleLongPress();
+                longPressTimeout = null;
+            }, 500); // 500ms threshold for long press
+        }
+
+        function handlePressEnd() {
+            if (longPressTimeout) {
+                clearTimeout(longPressTimeout);
+                longPressTimeout = null;
+                // Short press: restart timer
+                if (Date.now() - lastPressTime < 500) {
+                    startCountdown();
+                }
+            }
+        }
+
+        // Mouse event listeners
+        document.body.addEventListener('mousedown', handlePressStart);
+        document.body.addEventListener('mouseup', handlePressEnd);
+        document.body.addEventListener('mouseleave', handlePressEnd);
+
+        // Touch event listeners (for mobile)
+        document.body.addEventListener('touchstart', function (e) {
+            e.preventDefault();
+            handlePressStart();
+        }, { passive: false });
+        document.body.addEventListener('touchend', function (e) {
+            e.preventDefault();
+            handlePressEnd();
+        }, { passive: false });
+        document.body.addEventListener('touchcancel', function (e) {
+            e.preventDefault();
+            handlePressEnd();
+        }, { passive: false });
+    </script>
 </body>
 </html>
