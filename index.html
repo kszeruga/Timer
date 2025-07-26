@@ -3,15 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Board Game Timer - Active/Inactive Players</title>
+  <title>Countdown Timer 1.9</title>
   <style>
     html, body {
-      margin: 0; padding: 0; height: 100%; overflow: hidden;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
       font-family: sans-serif;
+      cursor: pointer;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
-      background: white;
+      background-color: white;
     }
 
     #timer {
@@ -19,38 +26,111 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) rotate(0deg);
-      font-size: 20vmin;
+      font-size: 80vmin; /* Better for mobile */
       color: #333;
-      transition: color 0.2s ease, transform 0.3s ease, opacity 0.3s ease;
+      transition: color 0.2s ease, transform 0.3s ease;
       user-select: none;
-      cursor: pointer;
-      opacity: 1;
-      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="timer">40</div>
+
+  <script>
+    const START_TIME = 40;
+    let countdown = START_TIME;
+    let intervalId;
+    let rotation = 0;
+    let isPaused = false;
+    let longPressTimeout;
+    let lastMouseDownTime = 0;
+
+    const colors = ['#333', '#e74c3c', '#2980b9', '#27ae60'];
+    let colorIndex = 0;
+    const timerElement = document.getElementById('timer');
+    function setupLongPressPause() {
+      let lastTouchTime = 0;
+    
+      function startLongPressTimer(e) {
+        lastTouchTime = Date.now();
+        longPressTimeout = setTimeout(() => {
+          isPaused = !isPaused;
+          timerElement.style.opacity = isPaused ? 0.5 : 1;
+        }, 500);
+      }
+    
+      function cancelLongPress(e) {
+        clearTimeout(longPressTimeout);
+        const duration = Date.now() - lastTouchTime;
+        if (duration < 500) {
+          startCountdown(); // treat as short tap
+        }
+      }
+    
+      // Mouse (desktop)
+      document.body.addEventListener('mousedown', startLongPressTimer);
+      document.body.addEventListener('mouseup', cancelLongPress);
+      document.body.addEventListener('mouseleave', cancelLongPress);
+    
+      // Touch (mobile)
+      document.body.addEventListener('touchstart', startLongPressTimer);
+      document.body.addEventListener('touchend', cancelLongPress);
+      document.body.addEventListener('touchcancel', cancelLongPress);
     }
 
-    #skipOverlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      font-size: 5vmin;
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      user-select: none;
-      padding: 10px;
+
+    function startCountdown() {
+      clearInterval(intervalId);
+      countdown = START_TIME;
+      timerElement.textContent = countdown;
+
+      rotation += 90;
+      timerElement.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+
+      colorIndex = (colorIndex + 1) % colors.length;
+      timerElement.style.color = colors[colorIndex];
+
+      isPaused = false;
+      timerElement.style.opacity = 1;
+
+      intervalId = setInterval(tick, 1000);
     }
 
-    #skipOverlay.visible {
-      visibility: visible;
-      opacity: 1;
+    function tick() {
+      if (!isPaused) {
+        countdown--;
+        timerElement.textContent = countdown;
+        if (countdown <= 0) {
+          clearInterval(intervalId);
+        }
+      }
     }
 
-    .skipButton {
-      background: #2980b9;
-      border: none;
-      margin: 10px;
+    // Start initially
+    startCountdown();
+    setupLongPressPause();
+
+    // Handle long press for pause
+    document.body.addEventListener('mousedown', () => {
+      lastMouseDownTime = Date.now();
+      longPressTimeout = setTimeout(() => {
+        isPaused = !isPaused;
+        timerElement.style.opacity = isPaused ? 0.5 : 1;
+      }, 500); // 500ms threshold for long press
+    });
+
+    document.body.addEventListener('mouseup', () => {
+      clearTimeout(longPressTimeout);
+      if (Date.now() - lastMouseDownTime < 500) {
+        startCountdown(); // short click => restart
+      }
+    });
+
+    // Prevent long press triggering after leaving window
+    document.body.addEventListener('mouseleave', () => {
+      clearTimeout(longPressTimeout);
+    });
+  </script>
+</body>
+</html>
