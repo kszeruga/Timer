@@ -26,20 +26,123 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(0deg);
-            font-size: 80vmin; /* Better for mobile */
+            font-size: 80vmin;
             color: #333;
             transition: color 0.2s ease, transform 0.3s ease;
             user-select: none;
         }
+
+        #optionsBtn {
+            position: absolute;
+            left: 50%;
+            top: 70%;
+            transform: translateX(-50%);
+            font-size: 2em;
+            padding: 0.5em 1em;
+            background: #2980b9;
+            color: #fff;
+            border: none;
+            border-radius: 0.5em;
+            cursor: pointer;
+            display: none;
+            z-index: 10;
+        }
+
+        #optionsPanel {
+            position: absolute;
+            left: 50%;
+            top: 80%;
+            transform: translateX(-50%);
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 0.5em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 1em;
+            min-width: 250px;
+            display: none;
+            z-index: 10;
+            transition: max-height 0.3s ease;
+        }
+
+            #optionsPanel.show {
+                display: block;
+            }
+
+        .player-checkbox {
+            margin-bottom: 0.5em;
+            display: flex;
+            align-items: center;
+        }
+
+            .player-checkbox label {
+                margin-left: 0.5em;
+            }
+
+        #intervalInput {
+            width: 60px;
+            font-size: 1em;
+            margin-left: 0.5em;
+        }
+
+        .options-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1em;
+            margin-top: 1.5em;
+        }
+
+        .icon-btn {
+            font-size: 1.8em;
+            padding: 0.2em 0.6em;
+            border: none;
+            border-radius: 0.4em;
+            cursor: pointer;
+            background: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        #okBtn {
+            color: #27ae60;
+        }
+
+            #okBtn:hover {
+                background: #eafaf1;
+            }
+
+        #cancelBtn {
+            color: #e74c3c;
+        }
+
+            #cancelBtn:hover {
+                background: #fdeaea;
+            }
     </style>
 </head>
 <body>
     <div id="timer">40</div>
+    <button id="optionsBtn">Options</button>
+    <div id="optionsPanel">
+        <div class="player-checkbox"><input type="checkbox" id="player1"><label for="player1">Gracz 1(N)</label></div>
+        <div class="player-checkbox"><input type="checkbox" id="player2"><label for="player2">Gracz 2(W)</label></div>
+        <div class="player-checkbox"><input type="checkbox" id="player3"><label for="player3">Gracz 3(S)</label></div>
+        <div class="player-checkbox"><input type="checkbox" id="player4"><label for="player4">Gracz 4(E)</label></div>
+        <div style="margin-top:1em;">
+            <label for="intervalInput">Countdown interval:</label>
+            <input type="number" id="intervalInput" min="5" max="300" value="40" />
+        </div>
+        <div class="options-actions">
+            <button id="okBtn" class="icon-btn" title="OK">&#10003;</button>
+            <button id="cancelBtn" class="icon-btn" title="Cancel">&#10005;</button>
+        </div>
+    </div>
     <!-- Preload sounds -->
     <audio id="tickSound" src="sounds/tick.mp3" preload="auto"></audio>
     <audio id="gongSound" src="sounds/gong.mp3" preload="auto"></audio>
     <script>
-        const START_TIME = 40;
+        let START_TIME = 40;
         let countdown = START_TIME;
         let intervalId;
         let rotation = 0;
@@ -47,11 +150,28 @@
         let longPressTimeout;
         let lastPressTime = 0;
 
+        // Store options state for cancel
+        let optionsState = {
+            interval: START_TIME,
+            players: [false, false, false, false]
+        };
+
         const colors = ['#333', '#e74c3c', '#2980b9', '#27ae60'];
         let colorIndex = 0;
         const timerElement = document.getElementById('timer');
         const tickSound = document.getElementById('tickSound');
         const gongSound = document.getElementById('gongSound');
+        const optionsBtn = document.getElementById('optionsBtn');
+        const optionsPanel = document.getElementById('optionsPanel');
+        const intervalInput = document.getElementById('intervalInput');
+        const okBtn = document.getElementById('okBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const playerCheckboxes = [
+            document.getElementById('player1'),
+            document.getElementById('player2'),
+            document.getElementById('player3'),
+            document.getElementById('player4')
+        ];
 
         function playTick() {
             tickSound.currentTime = 0;
@@ -77,6 +197,9 @@
             isPaused = false;
             timerElement.style.opacity = 1;
 
+            optionsBtn.style.display = "none";
+            optionsPanel.classList.remove("show");
+
             intervalId = setInterval(tick, 1000);
         }
 
@@ -101,6 +224,15 @@
         function handleLongPress() {
             isPaused = !isPaused;
             timerElement.style.opacity = isPaused ? 0.5 : 1;
+            optionsBtn.style.display = isPaused ? "block" : "none";
+            if (!isPaused) {
+                optionsPanel.classList.remove("show");
+            }
+            if (isPaused) {
+                // Save current state for cancel
+                optionsState.interval = intervalInput.value;
+                optionsState.players = playerCheckboxes.map(cb => cb.checked);
+            }
         }
 
         function handlePressStart() {
@@ -108,14 +240,13 @@
             longPressTimeout = setTimeout(() => {
                 handleLongPress();
                 longPressTimeout = null;
-            }, 500); // 500ms threshold for long press
+            }, 500);
         }
 
         function handlePressEnd() {
             if (longPressTimeout) {
                 clearTimeout(longPressTimeout);
                 longPressTimeout = null;
-                // Short press: restart timer
                 if (Date.now() - lastPressTime < 500) {
                     startCountdown();
                 }
@@ -140,6 +271,39 @@
             e.preventDefault();
             handlePressEnd();
         }, { passive: false });
+
+        // Options button logic
+        optionsBtn.addEventListener('click', function () {
+            optionsPanel.classList.toggle("show");
+        });
+
+        // Interval input logic
+        intervalInput.addEventListener('change', function () {
+            let val = parseInt(intervalInput.value, 10);
+            if (!isNaN(val) && val >= 5 && val <= 300) {
+                START_TIME = val;
+                countdown = val;
+                timerElement.textContent = countdown;
+            }
+        });
+
+        // OK button logic
+        okBtn.addEventListener('click', function () {
+            let val = parseInt(intervalInput.value, 10);
+            if (!isNaN(val) && val >= 5 && val <= 300) {
+                START_TIME = val;
+                countdown = val;
+                timerElement.textContent = countdown;
+            }
+            optionsPanel.classList.remove("show");
+        });
+
+        // Cancel button logic
+        cancelBtn.addEventListener('click', function () {
+            intervalInput.value = optionsState.interval;
+            playerCheckboxes.forEach((cb, i) => cb.checked = optionsState.players[i]);
+            optionsPanel.classList.remove("show");
+        });
     </script>
 </body>
 </html>
