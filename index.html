@@ -81,26 +81,48 @@
     // Start initially
     startCountdown();
 
-    // Handle long press for pause
-    document.body.addEventListener('mousedown', () => {
+    // Common logic for handling press start (mouse or touch)
+    function handlePressStart() {
       lastMouseDownTime = Date.now();
       longPressTimeout = setTimeout(() => {
         isPaused = !isPaused;
         timerElement.style.opacity = isPaused ? 0.5 : 1;
       }, 500); // 500ms threshold for long press
-    });
+    }
 
-    document.body.addEventListener('mouseup', () => {
+    // Common logic for handling press end (mouse or touch)
+    function handlePressEnd() {
       clearTimeout(longPressTimeout);
       if (Date.now() - lastMouseDownTime < 500) {
-        startCountdown(); // short click => restart
+        startCountdown(); // short press => restart
       }
-    });
+    }
 
-    // Prevent long press triggering after leaving window
-    document.body.addEventListener('mouseleave', () => {
+    // Common logic for canceling press
+    function handlePressCancel() {
       clearTimeout(longPressTimeout);
-    });
+    }
+
+    // Mouse event listeners
+    document.body.addEventListener('mousedown', handlePressStart);
+    document.body.addEventListener('mouseup', handlePressEnd);
+    document.body.addEventListener('mouseleave', handlePressCancel);
+
+    // Touch event listeners for mobile support
+    document.body.addEventListener('touchstart', (e) => {
+      e.preventDefault(); // Prevent scrolling and other default behaviors
+      handlePressStart();
+    }, { passive: false });
+
+    document.body.addEventListener('touchend', (e) => {
+      e.preventDefault(); // Prevent click events from firing
+      handlePressEnd();
+    }, { passive: false });
+
+    document.body.addEventListener('touchcancel', (e) => {
+      e.preventDefault();
+      handlePressCancel();
+    }, { passive: false });
   </script>
 </body>
 </html>
