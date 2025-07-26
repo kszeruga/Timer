@@ -35,7 +35,7 @@
         #optionsBtn {
             position: absolute;
             left: 50%;
-            top: 70%;
+            top: 2em;
             transform: translateX(-50%);
             font-size: 2em;
             padding: 0.5em 1em;
@@ -51,7 +51,7 @@
         #optionsPanel {
             position: absolute;
             left: 50%;
-            top: 80%;
+            top: 6em;
             transform: translateX(-50%);
             background: #fff;
             border: 1px solid #ccc;
@@ -125,10 +125,10 @@
     <div id="timer">40</div>
     <button id="optionsBtn">Options</button>
     <div id="optionsPanel">
-        <div class="player-checkbox"><input type="checkbox" id="player1"><label for="player1">Gracz 1(N)</label></div>
-        <div class="player-checkbox"><input type="checkbox" id="player2"><label for="player2">Gracz 2(W)</label></div>
-        <div class="player-checkbox"><input type="checkbox" id="player3"><label for="player3">Gracz 3(S)</label></div>
-        <div class="player-checkbox"><input type="checkbox" id="player4"><label for="player4">Gracz 4(E)</label></div>
+        <div class="player-checkbox"><input type="checkbox" id="player1"><label for="player1">Gracz 1 (N)</label></div>
+        <div class="player-checkbox"><input type="checkbox" id="player2"><label for="player2">Gracz 2 (W)</label></div>
+        <div class="player-checkbox"><input type="checkbox" id="player3"><label for="player3">Gracz 3 (S)</label></div>
+        <div class="player-checkbox"><input type="checkbox" id="player4"><label for="player4">Gracz 4 (E)</label></div>
         <div style="margin-top:1em;">
             <label for="intervalInput">Countdown interval:</label>
             <input type="number" id="intervalInput" min="5" max="300" value="40" />
@@ -244,7 +244,6 @@
         }
 
         function handlePressEnd(e) {
-            // Prevent short press from affecting optionsBtn/optionsPanel
             if (longPressTimeout) {
                 clearTimeout(longPressTimeout);
                 longPressTimeout = null;
@@ -282,16 +281,35 @@
         }, { passive: false });
 
         // Options button logic
-        optionsBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            optionsPanel.classList.toggle("show");
-        });
-
-        optionsBtn.addEventListener('touchend', function (e) {
+        function showOptionsPanel(e) {
             e.stopPropagation();
             e.preventDefault();
+            // Prevent menu from closing immediately by setting a flag
             optionsPanel.classList.toggle("show");
+            // Prevent timer from unpausing when interacting with options
+            window._optionsPanelOpen = optionsPanel.classList.contains("show");
+        }
+
+        optionsBtn.addEventListener('click', showOptionsPanel);
+        optionsBtn.addEventListener('touchend', showOptionsPanel, { passive: false });
+
+        // Prevent global touchend/mouseup from closing the menu when interacting with the panel
+        optionsPanel.addEventListener('touchend', function (e) {
+            e.stopPropagation();
         }, { passive: false });
+        optionsPanel.addEventListener('mousedown', function (e) {
+            e.stopPropagation();
+        });
+
+        // Prevent handlePressEnd from closing the menu if it's open
+        function patchedHandlePressEnd(e) {
+            if (window._optionsPanelOpen) return;
+            handlePressEnd(e);
+        }
+        document.body.removeEventListener('mouseup', handlePressEnd);
+        document.body.removeEventListener('touchend', handlePressEnd);
+        document.body.addEventListener('mouseup', patchedHandlePressEnd);
+        document.body.addEventListener('touchend', patchedHandlePressEnd, { passive: false });
 
         // Interval input logic
         intervalInput.addEventListener('change', function () {
@@ -312,6 +330,7 @@
                 timerElement.textContent = countdown;
             }
             optionsPanel.classList.remove("show");
+            window._optionsPanelOpen = false;
         });
 
         // Cancel button logic
@@ -319,6 +338,7 @@
             intervalInput.value = optionsState.interval;
             playerCheckboxes.forEach((cb, i) => cb.checked = optionsState.players[i]);
             optionsPanel.classList.remove("show");
+            window._optionsPanelOpen = false;
         });
     </script>
 </body>
