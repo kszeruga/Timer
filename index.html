@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +11,6 @@
       height: 100%;
       overflow: hidden;
     }
-
     body {
       font-family: sans-serif;
       cursor: pointer;
@@ -21,7 +19,6 @@
       touch-action: manipulation;
       background-color: white;
     }
-
     #timer {
       position: absolute;
       top: 50%;
@@ -34,10 +31,8 @@
     }
   </style>
 </head>
-
 <body>
   <div id="timer">40</div>
-
   <script>
     const START_TIME = 40;
     let countdown = START_TIME;
@@ -45,7 +40,7 @@
     let rotation = 0;
     let isPaused = false;
     let longPressTimeout;
-    let lastMouseDownTime = 0;
+    let lastPressTime = 0;
 
     const colors = ['#333', '#e74c3c', '#2980b9', '#27ae60'];
     let colorIndex = 0;
@@ -81,26 +76,48 @@
     // Start initially
     startCountdown();
 
-    // Handle long press for pause
-    document.body.addEventListener('mousedown', () => {
-      lastMouseDownTime = Date.now();
+    function handleLongPress() {
+      isPaused = !isPaused;
+      timerElement.style.opacity = isPaused ? 0.5 : 1;
+    }
+
+    function handlePressStart() {
+      lastPressTime = Date.now();
       longPressTimeout = setTimeout(() => {
-        isPaused = !isPaused;
-        timerElement.style.opacity = isPaused ? 0.5 : 1;
+        handleLongPress();
+        longPressTimeout = null;
       }, 500); // 500ms threshold for long press
-    });
+    }
 
-    document.body.addEventListener('mouseup', () => {
-      clearTimeout(longPressTimeout);
-      if (Date.now() - lastMouseDownTime < 500) {
-        startCountdown(); // short click => restart
+    function handlePressEnd() {
+      if (longPressTimeout) {
+        clearTimeout(longPressTimeout);
+        longPressTimeout = null;
+        // Short press: restart timer
+        if (Date.now() - lastPressTime < 500) {
+          startCountdown();
+        }
       }
-    });
+    }
 
-    // Prevent long press triggering after leaving window
-    document.body.addEventListener('mouseleave', () => {
-      clearTimeout(longPressTimeout);
-    });
+    // Mouse event listeners
+    document.body.addEventListener('mousedown', handlePressStart);
+    document.body.addEventListener('mouseup', handlePressEnd);
+    document.body.addEventListener('mouseleave', handlePressEnd);
+
+    // Touch event listeners (for mobile)
+    document.body.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      handlePressStart();
+    }, {passive: false});
+    document.body.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      handlePressEnd();
+    }, {passive: false});
+    document.body.addEventListener('touchcancel', function(e) {
+      e.preventDefault();
+      handlePressEnd();
+    }, {passive: false});
   </script>
 </body>
 </html>
