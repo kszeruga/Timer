@@ -150,7 +150,6 @@
         let longPressTimeout;
         let lastPressTime = 0;
 
-        // Store options state for cancel
         let optionsState = {
             interval: START_TIME,
             players: [false, false, false, false]
@@ -199,6 +198,7 @@
 
             optionsBtn.style.display = "none";
             optionsPanel.classList.remove("show");
+            window._optionsPanelOpen = false;
 
             intervalId = setInterval(tick, 1000);
         }
@@ -218,7 +218,6 @@
             }
         }
 
-        // Start initially
         startCountdown();
 
         function handleLongPress() {
@@ -227,14 +226,15 @@
             optionsBtn.style.display = isPaused ? "block" : "none";
             if (!isPaused) {
                 optionsPanel.classList.remove("show");
+                window._optionsPanelOpen = false;
             }
             if (isPaused) {
-                // Save current state for cancel
                 optionsState.interval = intervalInput.value;
                 optionsState.players = playerCheckboxes.map(cb => cb.checked);
             }
         }
 
+        // Use pointer events for cross-device consistency
         function handlePressStart(e) {
             lastPressTime = Date.now();
             longPressTimeout = setTimeout(() => {
@@ -247,6 +247,8 @@
             if (longPressTimeout) {
                 clearTimeout(longPressTimeout);
                 longPressTimeout = null;
+                // If the options menu is open, do NOT restart timer
+                if (window._optionsPanelOpen) return;
                 // If the event target is the options button or inside the options panel, do nothing
                 if (
                     e.target === optionsBtn ||
@@ -261,55 +263,32 @@
             }
         }
 
-        // Mouse event listeners
-        document.body.addEventListener('mousedown', handlePressStart);
-        document.body.addEventListener('mouseup', handlePressEnd);
-        document.body.addEventListener('mouseleave', handlePressEnd);
-
-        // Touch event listeners (for mobile)
-        document.body.addEventListener('touchstart', function (e) {
-            e.preventDefault();
-            handlePressStart(e);
-        }, { passive: false });
-        document.body.addEventListener('touchend', function (e) {
-            e.preventDefault();
-            handlePressEnd(e);
-        }, { passive: false });
-        document.body.addEventListener('touchcancel', function (e) {
-            e.preventDefault();
-            handlePressEnd(e);
-        }, { passive: false });
+        // Pointer event listeners (better than mixing mouse/touch)
+        document.body.addEventListener('pointerdown', handlePressStart);
+        document.body.addEventListener('pointerup', handlePressEnd);
+        document.body.addEventListener('pointerleave', handlePressEnd);
 
         // Options button logic
         function showOptionsPanel(e) {
             e.stopPropagation();
-            e.preventDefault();
-            // Prevent menu from closing immediately by setting a flag
-            optionsPanel.classList.toggle("show");
-            // Prevent timer from unpausing when interacting with options
-            window._optionsPanelOpen = optionsPanel.classList.contains("show");
+            // Do not preventDefault here: allow buttons to work
+            if (!window._optionsPanelOpen) {
+                optionsPanel.classList.add("show");
+                window._optionsPanelOpen = true;
+            }
         }
 
         optionsBtn.addEventListener('click', showOptionsPanel);
-        optionsBtn.addEventListener('touchend', showOptionsPanel, { passive: false });
+        optionsBtn.addEventListener('pointerup', showOptionsPanel);
 
-        // Prevent global touchend/mouseup from closing the menu when interacting with the panel
-        optionsPanel.addEventListener('touchend', function (e) {
-            e.stopPropagation();
-        }, { passive: false });
-        optionsPanel.addEventListener('mousedown', function (e) {
+        // Prevent global pointerup from closing the menu when interacting with the panel
+        optionsPanel.addEventListener('pointerup', function (e) {
             e.stopPropagation();
         });
 
-        // Prevent handlePressEnd from closing the menu if it's open
-        function patchedHandlePressEnd(e) {
-            if (window._optionsPanelOpen) return;
-            handlePressEnd(e);
-        }
-        document.body.removeEventListener('mouseup', handlePressEnd);
-        document.body.removeEventListener('touchend', handlePressEnd);
-        document.body.addEventListener('mouseup', patchedHandlePressEnd);
-        document.body.addEventListener('touchend', patchedHandlePressEnd, { passive: false });
+        optionsPanel.addEventListener('pointerdown', function (e) {
+            e.stopPropagation();
+        });
 
         // Interval input logic
         intervalInput.addEventListener('change', function () {
