@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <title>Countdown Timer 2.1</title>
+    <title>Countdown Timer 2.2</title>
     <style>
         html, body {
             margin: 0;
@@ -191,18 +191,23 @@
         let currentPlayer = 0;
 
         function playTick() {
+            console.log("playTick called");
             tickSound.currentTime = 0;
             tickSound.play();
         }
 
         function playGong() {
+            console.log("playGong called");
             gongSound.currentTime = 0;
             gongSound.play();
         }
+
         function isPlayerActive(index) {
+            console.log("isPlayerActive called with index:", index);
             return optionsState.players[index];
         }
         function startCountdown() {
+            console.log("startCountdown called");
 
             if (!optionsState.players.some(isActive => isActive)) {
                 alert("Brak graczy, włącz przynajmniej jednego");
@@ -213,11 +218,9 @@
             timerElement.textContent = countdown;
 
             do {
-                currentPlayer = (currentPlayer + 1) % 4
+                currentPlayer = (currentPlayer + 1) % 4;
                 rotation += 90;
-                
                 colorIndex = (colorIndex + 1) % colors.length;
-            
             } while (!isPlayerActive(currentPlayer));
 
             timerElement.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
@@ -251,6 +254,7 @@
         startCountdown();
 
         function handleLongPress() {
+            console.log("handleLongPress called");
             isPaused = !isPaused;
             timerElement.style.opacity = isPaused ? 0.5 : 1;
             optionsBtn.style.display = isPaused ? "block" : "none";
@@ -266,6 +270,7 @@
 
         // Use pointer events for cross-device consistency
         function handlePressStart(e) {
+            console.log("handlePressStart called");
             lastPressTime = Date.now();
             longPressTimeout = setTimeout(() => {
                 handleLongPress();
@@ -274,6 +279,7 @@
         }
 
         function handlePressEnd(e) {
+            console.log("handlePressEnd called");
             if (longPressTimeout) {
                 clearTimeout(longPressTimeout);
                 longPressTimeout = null;
@@ -306,6 +312,7 @@
 
         // Options button logic
         function showOptionsPanel(e) {
+            console.log("showOptionsPanel called");
             e.stopPropagation();
             // Do not preventDefault here: allow buttons to work
             if (!window._optionsPanelOpen) {
