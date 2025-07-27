@@ -51,7 +51,7 @@
         #optionsPanel {
             position: absolute;
             left: 50%;
-            top: 6em;
+            top: 8em; /* Increased from 6em to 8em */
             transform: translateX(-50%);
             background: #fff;
             border: 1px solid #ccc;
@@ -152,7 +152,7 @@
 
         let optionsState = {
             interval: START_TIME,
-            players: [false, false, false, false]
+            players: [true, true, true, true]
         };
 
         const colors = ['#333', '#e74c3c', '#2980b9', '#27ae60'];
@@ -171,6 +171,7 @@
             document.getElementById('player3'),
             document.getElementById('player4')
         ];
+        let currentPlayer = 0;
 
         function playTick() {
             tickSound.currentTime = 0;
@@ -181,17 +182,30 @@
             gongSound.currentTime = 0;
             gongSound.play();
         }
+        function isPlayerActive(index) {
 
+            return playerCheckboxes[index].checked;
+        }
         function startCountdown() {
+
+            if (!playerCheckboxes.some(cb => cb.checked)) {
+                alert("No active players! Please enable at least one player.");
+                return;
+            }
             clearInterval(intervalId);
             countdown = START_TIME;
             timerElement.textContent = countdown;
 
-            rotation += 90;
-            timerElement.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+            do {
+                currentPlayer = (currentPlayer + 1) % 4
+                rotation += 90;
+                
+                colorIndex = (colorIndex + 1) % colors.length;
+            
+            } while (!isPlayerActive(currentPlayer));
 
-            colorIndex = (colorIndex + 1) % colors.length;
-            timerElement.style.color = colors[colorIndex];
+            timerElement.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+            timerElement.style.color = colors[colorIndex];    
 
             isPaused = false;
             timerElement.style.opacity = 1;
@@ -308,6 +322,8 @@
                 countdown = val;
                 timerElement.textContent = countdown;
             }
+            optionsState.interval = START_TIME;
+            optionsState.players = playerCheckboxes.map(cb => cb.checked);
             optionsPanel.classList.remove("show");
             window._optionsPanelOpen = false;
         });
