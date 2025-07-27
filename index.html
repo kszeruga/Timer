@@ -263,6 +263,7 @@
                 window._optionsPanelOpen = false;
             }
             if (isPaused) {
+                countdown = optionsState.interval;
                 optionsState.interval = intervalInput.value;
                 optionsState.players = playerCheckboxes.map(cb => cb.checked);
             }
