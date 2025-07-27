@@ -51,14 +51,14 @@
         #optionsPanel {
             position: absolute;
             left: 50%;
-            top: 50%; /* Center vertically */
-            transform: translate(-50%, -50%); /* Center horizontally and vertically */
+            top: 50%;
+            transform: translate(-50%, -50%);
             background: #fff;
             border: 1px solid #ccc;
             border-radius: 0.5em;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            padding: 2em; /* Increased padding for symmetry */
-            min-width: 150px; /* Slightly wider for balance */
+            padding: 2em;
+            min-width: 150px;
             display: none;
             z-index: 10;
             transition: max-height 0.3s ease;
@@ -86,9 +86,9 @@
 
         .options-actions {
             display: flex;
-            justify-content: space-between; /* Spread buttons evenly */
+            justify-content: space-between;
             gap: 1em;
-            margin-top: 2em; /* Increased spacing for symmetry */
+            margin-top: 2em;
         }
 
         .icon-btn {
@@ -154,7 +154,8 @@
     <audio id="tickSound" src="sounds/tick.mp3" preload="auto"></audio>
     <audio id="gongSound" src="sounds/gong.mp3" preload="auto"></audio>
     <script>
-        let START_TIME = 40;
+        // Constants and State
+        const START_TIME = 40;
         let countdown = START_TIME;
         let intervalId;
         let rotation = 270;
@@ -162,13 +163,16 @@
         let longPressTimeout;
         let lastPressTime = 0;
 
-        let optionsState = {
+        const optionsState = {
             interval: START_TIME,
             players: [true, true, true, true]
         };
 
         const colors = ['#333', '#e74c3c', '#2980b9', '#27ae60'];
         let colorIndex = 3;
+        let currentPlayer = 3;
+
+        // DOM Elements
         const timerElement = document.getElementById('timer');
         const tickSound = document.getElementById('tickSound');
         const gongSound = document.getElementById('gongSound');
@@ -184,35 +188,34 @@
             document.getElementById('player4')
         ];
 
+        // Initialize Player Checkboxes
         playerCheckboxes.forEach((checkbox, index) => {
             checkbox.checked = optionsState.players[index];
         });
 
-        let currentPlayer = 3;
-
-        function playTick() {
-            console.log("playTick called");
-            tickSound.currentTime = 0;
-            tickSound.play();
+        // Helper Functions
+        function playSound(sound) {
+            sound.currentTime = 0;
+            sound.play();
         }
 
-        function playGong() {
-            console.log("playGong called");
-            gongSound.currentTime = 0;
-            gongSound.play();
+        function updateTimerAppearance() {
+            timerElement.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+            timerElement.style.color = colors[colorIndex];
         }
 
-        function isPlayerActive(index) {
-            console.log("isPlayerActive called with index:", index);
-            return optionsState.players[index];
+        function hideOptionsPanel() {
+            optionsPanel.classList.remove("show");
+            window._optionsPanelOpen = false;
         }
+
+        // Core Functions
         function startCountdown() {
-            console.log("startCountdown called");
-
             if (!optionsState.players.some(isActive => isActive)) {
                 alert("Brak graczy, włącz przynajmniej jednego");
                 return;
             }
+
             clearInterval(intervalId);
             countdown = START_TIME;
             timerElement.textContent = countdown;
@@ -221,17 +224,13 @@
                 currentPlayer = (currentPlayer + 1) % 4;
                 rotation += 90;
                 colorIndex = (colorIndex + 1) % colors.length;
-            } while (!isPlayerActive(currentPlayer));
+            } while (!optionsState.players[currentPlayer]);
 
-            timerElement.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
-            timerElement.style.color = colors[colorIndex];    
-
+            updateTimerAppearance();
             isPaused = false;
             timerElement.style.opacity = 1;
-
             optionsBtn.style.display = "none";
-            optionsPanel.classList.remove("show");
-            window._optionsPanelOpen = false;
+            hideOptionsPanel();
 
             intervalId = setInterval(tick, 1000);
         }
@@ -240,138 +239,75 @@
             if (!isPaused) {
                 countdown--;
                 timerElement.textContent = countdown;
-                if (countdown <= 5 && countdown > 0) {
-                    playTick();
-                }
+                if (countdown <= 5 && countdown > 0) playSound(tickSound);
                 if (countdown <= 0) {
                     clearInterval(intervalId);
                     timerElement.textContent = 0;
-                    playGong();
+                    playSound(gongSound);
                 }
             }
         }
 
-        startCountdown();
-
         function handleLongPress() {
-            console.log("handleLongPress called");
             isPaused = !isPaused;
             timerElement.style.opacity = isPaused ? 0.5 : 1;
             optionsBtn.style.display = isPaused ? "block" : "none";
-            if (!isPaused) {
-                optionsPanel.classList.remove("show");
-                window._optionsPanelOpen = false;
-            }
-            if (isPaused) {
-                countdown = optionsState.interval;
-                timerElement.textContent = countdown;
-                optionsState.interval = intervalInput.value;
-                optionsState.players = playerCheckboxes.map(cb => cb.checked);
-            }
+            if (!isPaused) hideOptionsPanel();
         }
 
-        // Use pointer events for cross-device consistency
-        function handlePressStart(e) {
-            console.log("handlePressStart called");
-            // Ignore events originating from the options button
+        // Event Listeners
+        document.body.addEventListener('pointerdown', (e) => {
             if (e.target === optionsBtn || optionsPanel.contains(e.target)) return;
-
             lastPressTime = Date.now();
-            longPressTimeout = setTimeout(() => {
-                handleLongPress();
-                longPressTimeout = null;
-            }, 500);
-        }
+            longPressTimeout = setTimeout(handleLongPress, 500);
+        });
 
-        function handlePressEnd(e) {
-            console.log("handlePressEnd called");
+        document.body.addEventListener('pointerup', (e) => {
             if (e.target === optionsBtn || optionsPanel.contains(e.target)) return;
             if (longPressTimeout) {
                 clearTimeout(longPressTimeout);
                 longPressTimeout = null;
-                // If the options menu is open, do NOT restart timer
                 if (window._optionsPanelOpen) return;
-
-                // Short press: restart timer
                 if (Date.now() - lastPressTime < 500) {
-                    if (isPaused) {
-                        handleLongPress();
-                    }
-                    else {
-                        startCountdown();
-                    }
-                    
+                    isPaused ? handleLongPress() : startCountdown();
                 }
             }
-        }
-
-        // Pointer event listeners (better than mixing mouse/touch)
-        document.body.addEventListener('pointerdown', handlePressStart);
-        document.body.addEventListener('pointerup', handlePressEnd);
-        document.body.addEventListener('pointerleave', handlePressEnd);
-
-        // Options button logic
-        function showOptionsPanel(e) {
-            console.log("showOptionsPanel called");
-            e.stopPropagation();
-            // Do not preventDefault here: allow buttons to work
-            if (!window._optionsPanelOpen) {
-                optionsPanel.classList.add("show");
-                window._optionsPanelOpen = true;
-            }
-        }
-
-        optionsBtn.addEventListener('click', function (e) {
-            console.log("optionsBtn clicked");
-            e.stopPropagation(); // Prevent event from propagating down
-            showOptionsPanel(e);
-        });
-        optionsBtn.addEventListener('pointerup', showOptionsPanel);
-
-        // Prevent global pointerup from closing the menu when interacting with the panel
-        optionsPanel.addEventListener('pointerup', function (e) {
-            e.stopPropagation();
         });
 
-        optionsPanel.addEventListener('pointerdown', function (e) {
+        optionsBtn.addEventListener('click', (e) => {
             e.stopPropagation();
+            optionsPanel.classList.toggle("show");
+            window._optionsPanelOpen = !window._optionsPanelOpen;
         });
 
-        optionsPanel.addEventListener('click', function (e) {
-            e.stopPropagation();
-        });
-
-        // Interval input logic
-        intervalInput.addEventListener('change', function () {
-            let val = parseInt(intervalInput.value, 10);
+        intervalInput.addEventListener('change', () => {
+            const val = parseInt(intervalInput.value, 10);
             if (!isNaN(val) && val >= 5 && val <= 300) {
-                START_TIME = val;
+                optionsState.interval = val;
                 countdown = val;
                 timerElement.textContent = countdown;
             }
         });
 
-        // OK button logic
-        okBtn.addEventListener('click', function () {
-            let val = parseInt(intervalInput.value, 10);
+        okBtn.addEventListener('click', () => {
+            const val = parseInt(intervalInput.value, 10);
             if (!isNaN(val) && val >= 5 && val <= 300) {
-                START_TIME = val;
+                optionsState.interval = val;
                 countdown = val;
                 timerElement.textContent = countdown;
             }
-            optionsState.interval = START_TIME;
             optionsState.players = playerCheckboxes.map(cb => cb.checked);
-            optionsPanel.classList.remove("show");
-            window._optionsPanelOpen = false;
+            hideOptionsPanel();
         });
 
-        // Cancel button logic
-        cancelBtn.addEventListener('click', function () {
+        cancelBtn.addEventListener('click', () => {
             intervalInput.value = optionsState.interval;
             playerCheckboxes.forEach((cb, i) => cb.checked = optionsState.players[i]);
-            optionsPanel.classList.remove("show");
-            window._optionsPanelOpen = false;
+            hideOptionsPanel();
         });
+
+        // Start the Timer
+        startCountdown();
     </script>
 </body>
 </html>
