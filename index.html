@@ -264,6 +264,7 @@
             }
             if (isPaused) {
                 countdown = optionsState.interval;
+                timerElement.textContent = countdown;
                 optionsState.interval = intervalInput.value;
                 optionsState.players = playerCheckboxes.map(cb => cb.checked);
             }
