@@ -288,7 +288,13 @@
                 }
                 // Short press: restart timer
                 if (Date.now() - lastPressTime < 500) {
-                    startCountdown();
+                    if (isPaused) {
+                        isPaused = false;
+                    }
+                    else {
+                        startCountdown();
+                    }
+                    
                 }
             }
         }
@@ -317,6 +323,10 @@
         });
 
         optionsPanel.addEventListener('pointerdown', function (e) {
+            e.stopPropagation();
+        });
+
+        optionsPanel.addEventListener('click', function (e) {
             e.stopPropagation();
         });
 
