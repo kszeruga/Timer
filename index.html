@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <title>Countdown Timer 2.3</title>
+    <title>Countdown Timer 2.4</title>
     <style>
         html, body {
             margin: 0;
@@ -271,6 +271,9 @@
         // Use pointer events for cross-device consistency
         function handlePressStart(e) {
             console.log("handlePressStart called");
+            // Ignore events originating from the options button
+            if (e.target === optionsBtn || optionsPanel.contains(e.target)) return;
+
             lastPressTime = Date.now();
             longPressTimeout = setTimeout(() => {
                 handleLongPress();
@@ -280,18 +283,13 @@
 
         function handlePressEnd(e) {
             console.log("handlePressEnd called");
+            if (e.target === optionsBtn || optionsPanel.contains(e.target)) return;
             if (longPressTimeout) {
                 clearTimeout(longPressTimeout);
                 longPressTimeout = null;
                 // If the options menu is open, do NOT restart timer
                 if (window._optionsPanelOpen) return;
-                // If the event target is the options button or inside the options panel, do nothing
-                if (
-                    e.target === optionsBtn ||
-                    optionsPanel.contains(e.target)
-                ) {
-                    return;
-                }
+
                 // Short press: restart timer
                 if (Date.now() - lastPressTime < 500) {
                     if (isPaused) {
