@@ -183,6 +183,11 @@
             document.getElementById('player3'),
             document.getElementById('player4')
         ];
+
+        playerCheckboxes.forEach((checkbox, index) => {
+            checkbox.checked = optionsState.players[index];
+        });
+
         let currentPlayer = 0;
 
         function playTick() {
@@ -200,7 +205,7 @@
         function startCountdown() {
 
             if (!optionsState.players.some(isActive => isActive)) {
-                alert("No active players! Please enable at least one player.");
+                alert("Brak graczy, włącz przynajmniej jednego");
                 return;
             }
             clearInterval(intervalId);
