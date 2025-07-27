@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <title>Countdown Timer 2.4</title>
+    <title>Countdown Timer 2.5</title>
     <style>
         html, body {
             margin: 0;
@@ -51,14 +51,14 @@
         #optionsPanel {
             position: absolute;
             left: 50%;
-            top: 10em; 
-            transform: translateX(-50%);
+            top: 50%; /* Center vertically */
+            transform: translate(-50%, -50%); /* Center horizontally and vertically */
             background: #fff;
             border: 1px solid #ccc;
             border-radius: 0.5em;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            padding: 1em;
-            min-width: 250px;
+            padding: 2em; /* Increased padding for symmetry */
+            min-width: 300px; /* Slightly wider for balance */
             display: none;
             z-index: 10;
             transition: max-height 0.3s ease;
@@ -86,9 +86,9 @@
 
         .options-actions {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between; /* Spread buttons evenly */
             gap: 1em;
-            margin-top: 1.5em;
+            margin-top: 2em; /* Increased spacing for symmetry */
         }
 
         .icon-btn {
