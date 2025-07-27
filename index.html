@@ -157,7 +157,7 @@
         let START_TIME = 40;
         let countdown = START_TIME;
         let intervalId;
-        let rotation = 0;
+        let rotation = 270;
         let isPaused = false;
         let longPressTimeout;
         let lastPressTime = 0;
@@ -188,7 +188,7 @@
             checkbox.checked = optionsState.players[index];
         });
 
-        let currentPlayer = 0;
+        let currentPlayer = 3;
 
         function playTick() {
             console.log("playTick called");
