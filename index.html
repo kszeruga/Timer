@@ -1,377 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <title>Countdown Timer</title>
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        body {
-            font-family: sans-serif;
-            cursor: pointer;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            background-color: white;
-        }
-
-        #timer {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(0deg);
-            font-size: 80vmin;
-            color: #333;
-            transition: color 0.2s ease, transform 0.3s ease;
-            user-select: none;
-        }
-
-        #optionsBtn {
-            position: absolute;
-            left: 50%;
-            top: 2em;
-            transform: translateX(-50%);
-            font-size: 2em;
-            padding: 0.5em 1em;
-            background: #2980b9;
-            color: #fff;
-            border: none;
-            border-radius: 0.5em;
-            cursor: pointer;
-            display: none;
-            z-index: 10;
-        }
-
-        #optionsPanel {
-            position: absolute;
-            left: 50%;
-            top: 50%; /* Center vertically */
-            transform: translate(-50%, -50%); /* Center horizontally and vertically */
-            background: #fff;
-            border: 1px solid #ccc;
-            border-radius: 0.5em;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            padding: 2em; /* Increased padding for symmetry */
-            min-width: 150px; /* Slightly wider for balance */
-            display: none;
-            z-index: 10;
-            transition: max-height 0.3s ease;
-        }
-
-            #optionsPanel.show {
-                display: block;
-            }
-
-        .player-checkbox {
-            margin-bottom: 0.5em;
-            display: flex;
-            align-items: center;
-        }
-
-            .player-checkbox label {
-                margin-left: 0.5em;
-            }
-
-        #intervalInput {
-            width: 60px;
-            font-size: 1em;
-            margin-left: 0.5em;
-        }
-
-        .options-actions {
-            display: flex;
-            justify-content: space-between; /* Spread buttons evenly */
-            gap: 1em;
-            margin-top: 2em; /* Increased spacing for symmetry */
-        }
-
-        .icon-btn {
-            font-size: 1.8em;
-            padding: 0.2em 0.6em;
-            border: none;
-            border-radius: 0.4em;
-            cursor: pointer;
-            background: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-
-        #okBtn {
-            color: #27ae60;
-        }
-
-            #okBtn:hover {
-                background: #eafaf1;
-            }
-
-        #cancelBtn {
-            color: #e74c3c;
-        }
-
-            #cancelBtn:hover {
-                background: #fdeaea;
-            }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>Countdown Timer</title>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+    }
+    body {
+        font-family: sans-serif;
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+        background-color: white;
+    }
+    #timer {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(0deg);
+        font-size: 80vmin;
+        color: #333;
+        transition: color 0.2s ease, transform 0.3s ease;
+        user-select: none;
+    }
+    #optionsBtn {
+        position: absolute;
+        left: 50%;
+        top: 2em;
+        transform: translateX(-50%);
+        font-size: 2em;
+        padding: 0.5em 1em;
+        background: #2980b9;
+        color: #fff;
+        border: none;
+        border-radius: 0.5em;
+        cursor: pointer;
+        display: none;
+        z-index: 10;
+    }
+    #optionsPanel {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 0.5em;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 2em;
+        min-width: 150px;
+        display: none;
+        z-index: 10;
+    }
+    #optionsPanel.show {
+        display: block;
+    }
+    .player-checkbox {
+        margin-bottom: 0.5em;
+        display: flex;
+        align-items: center;
+    }
+    .player-checkbox label {
+        margin-left: 0.5em;
+    }
+    #intervalInput {
+        width: 60px;
+        font-size: 1em;
+        margin-left: 0.5em;
+    }
+    .options-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 1em;
+        margin-top: 2em;
+    }
+    .icon-btn {
+        font-size: 1.8em;
+        padding: 0.2em 0.6em;
+        border: none;
+        border-radius: 0.4em;
+        cursor: pointer;
+        background: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+    }
+    #okBtn { color: #27ae60; }
+    #okBtn:hover { background: #eafaf1; }
+    #cancelBtn { color: #e74c3c; }
+    #cancelBtn:hover { background: #fdeaea; }
+</style>
 </head>
 <body>
-    <div id="timer">40</div>
-    <button id="optionsBtn">Opcje</button>
-    <div id="optionsPanel">
-        <div class="player-checkbox">
-            <input type="checkbox" id="player1">
-            <label for="player1" style="color: #333;">Gracz A (↓)</label>
-        </div>
-        <div class="player-checkbox">
-            <input type="checkbox" id="player2">
-            <label for="player2" style="color: #e74c3c;">Gracz B (←)</label>
-        </div>
-        <div class="player-checkbox">
-            <input type="checkbox" id="player3">
-            <label for="player3" style="color: #2980b9;">Gracz C (↑)</label>
-        </div>
-        <div class="player-checkbox">
-            <input type="checkbox" id="player4">
-            <label for="player4" style="color: #27ae60;">Gracz D (→)</label>
-        </div>
-        <div style="margin-top:1em;">
-            <label for="intervalInput">Czas:</label>
-            <input type="number" id="intervalInput" min="5" max="300" value="40" />
-        </div>
-        <div class="options-actions">
-            <button id="okBtn" class="icon-btn" title="OK">&#10003;</button>
-            <button id="cancelBtn" class="icon-btn" title="Cancel">&#10005;</button>
-        </div>
+<div id="timer">40</div>
+<button id="optionsBtn">Opcje</button>
+<div id="optionsPanel">
+    <div class="player-checkbox">
+        <input type="checkbox" id="player1"><label for="player1" style="color: #333;">Gracz A (↓)</label>
     </div>
-    <!-- Preload sounds -->
-    <audio id="tickSound" src="sounds/tick.mp3" preload="auto"></audio>
-    <audio id="gongSound" src="sounds/gong.mp3" preload="auto"></audio>
-    <script>
-        let START_TIME = 40;
-        let countdown = START_TIME;
-        let intervalId;
-        let rotation = 270;
-        let isPaused = false;
-        let longPressTimeout;
-        let lastPressTime = 0;
+    <div class="player-checkbox">
+        <input type="checkbox" id="player2"><label for="player2" style="color: #e74c3c;">Gracz B (←)</label>
+    </div>
+    <div class="player-checkbox">
+        <input type="checkbox" id="player3"><label for="player3" style="color: #2980b9;">Gracz C (↑)</label>
+    </div>
+    <div class="player-checkbox">
+        <input type="checkbox" id="player4"><label for="player4" style="color: #27ae60;">Gracz D (→)</label>
+    </div>
+    <div style="margin-top:1em;">
+        <label for="intervalInput">Czas:</label>
+        <input type="number" id="intervalInput" min="5" max="300" value="40" />
+    </div>
+    <div class="options-actions">
+        <button id="okBtn" class="icon-btn" title="OK" aria-label="Confirm">&#10003;</button>
+        <button id="cancelBtn" class="icon-btn" title="Cancel" aria-label="Cancel">&#10005;</button>
+    </div>
+</div>
+<audio id="tickSound" src="sounds/tick.mp3" preload="auto"></audio>
+<audio id="gongSound" src="sounds/gong.mp3" preload="auto"></audio>
 
-        let optionsState = {
-            interval: START_TIME,
-            players: [true, true, true, true]
-        };
+<script>
+(() => {
+    // ===== Constants =====
+    const LONG_PRESS_MS = 500;
+    const MIN_INTERVAL = 5;
+    const MAX_INTERVAL = 300;
+    const PLAYER_COLORS = ['#333', '#e74c3c', '#2980b9', '#27ae60'];
 
-        const colors = ['#333', '#e74c3c', '#2980b9', '#27ae60'];
-        let colorIndex = 3;
-        const timerElement = document.getElementById('timer');
-        const tickSound = document.getElementById('tickSound');
-        const gongSound = document.getElementById('gongSound');
-        const optionsBtn = document.getElementById('optionsBtn');
-        const optionsPanel = document.getElementById('optionsPanel');
-        const intervalInput = document.getElementById('intervalInput');
-        const okBtn = document.getElementById('okBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const playerCheckboxes = [
-            document.getElementById('player1'),
-            document.getElementById('player2'),
-            document.getElementById('player3'),
-            document.getElementById('player4')
-        ];
+    // ===== State =====
+    const state = {
+        startTime: 40,
+        countdown: 40,
+        rotation: 270,
+        isPaused: false,
+        currentPlayer: 3,
+        players: [true, true, true, true],
+        intervalId: null,
+        lastPressTime: 0,
+        longPressTimeout: null
+    };
 
-        playerCheckboxes.forEach((checkbox, index) => {
-            checkbox.checked = optionsState.players[index];
-        });
+    // ===== Elements =====
+    const timerEl = document.getElementById('timer');
+    const optionsBtn = document.getElementById('optionsBtn');
+    const optionsPanel = document.getElementById('optionsPanel');
+    const intervalInput = document.getElementById('intervalInput');
+    const playerCheckboxes = [
+        document.getElementById('player1'),
+        document.getElementById('player2'),
+        document.getElementById('player3'),
+        document.getElementById('player4')
+    ];
+    const tickSound = document.getElementById('tickSound');
+    const gongSound = document.getElementById('gongSound');
+    const okBtn = document.getElementById('okBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
 
-        let currentPlayer = 3;
+    // ===== Helpers =====
+    const playSound = (audio) => { audio.currentTime = 0; audio.play(); };
+    const isValidInterval = (v) => Number.isInteger(v) && v >= MIN_INTERVAL && v <= MAX_INTERVAL;
+    const isOptionsPanelOpen = () => optionsPanel.classList.contains('show');
+    const savePlayerSelection = () => state.players = playerCheckboxes.map(cb => cb.checked);
+    const loadPlayerSelection = () => playerCheckboxes.forEach((cb, i) => cb.checked = state.players[i]);
 
-        function playTick() {
-            console.log("playTick called");
-            tickSound.currentTime = 0;
-            tickSound.play();
-        }
+    const setStartTime = (val) => {
+        state.startTime = val;
+        state.countdown = val;
+        timerEl.textContent = val;
+    };
 
-        function playGong() {
-            console.log("playGong called");
-            gongSound.currentTime = 0;
-            gongSound.play();
-        }
-
-        function isPlayerActive(index) {
-            console.log("isPlayerActive called with index:", index);
-            return optionsState.players[index];
-        }
-        function startCountdown() {
-            console.log("startCountdown called");
-
-            if (!optionsState.players.some(isActive => isActive)) {
-                alert("Brak graczy, włącz przynajmniej jednego");
-                return;
-            }
-            clearInterval(intervalId);
-            countdown = START_TIME;
-            timerElement.textContent = countdown;
-
-            do {
-                currentPlayer = (currentPlayer + 1) % 4;
-                rotation += 90;
-                colorIndex = (colorIndex + 1) % colors.length;
-            } while (!isPlayerActive(currentPlayer));
-
-            timerElement.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
-            timerElement.style.color = colors[colorIndex];    
-
-            isPaused = false;
-            timerElement.style.opacity = 1;
-
-            optionsBtn.style.display = "none";
-            optionsPanel.classList.remove("show");
-            window._optionsPanelOpen = false;
-
-            intervalId = setInterval(tick, 1000);
-        }
-
-        function tick() {
-            if (!isPaused) {
-                countdown--;
-                timerElement.textContent = countdown;
-                if (countdown <= 5 && countdown > 0) {
-                    playTick();
-                }
-                if (countdown <= 0) {
-                    clearInterval(intervalId);
-                    timerElement.textContent = 0;
-                    playGong();
-                }
-            }
-        }
-
-        startCountdown();
-
-        function handleLongPress() {
-            console.log("handleLongPress called");
-            isPaused = !isPaused;
-            timerElement.style.opacity = isPaused ? 0.5 : 1;
-            optionsBtn.style.display = isPaused ? "block" : "none";
-            if (!isPaused) {
-                optionsPanel.classList.remove("show");
-                window._optionsPanelOpen = false;
-            }
-            if (isPaused) {
-                countdown = optionsState.interval;
-                timerElement.textContent = countdown;
-                optionsState.interval = intervalInput.value;
-                optionsState.players = playerCheckboxes.map(cb => cb.checked);
-            }
-        }
-
-        // Use pointer events for cross-device consistency
-        function handlePressStart(e) {
-            console.log("handlePressStart called");
-            // Ignore events originating from the options button
-            if (e.target === optionsBtn || optionsPanel.contains(e.target)) return;
-
-            lastPressTime = Date.now();
-            longPressTimeout = setTimeout(() => {
-                handleLongPress();
-                longPressTimeout = null;
-            }, 500);
-        }
-
-        function handlePressEnd(e) {
-            console.log("handlePressEnd called");
-            if (e.target === optionsBtn || optionsPanel.contains(e.target)) return;
-            if (longPressTimeout) {
-                clearTimeout(longPressTimeout);
-                longPressTimeout = null;
-                // If the options menu is open, do NOT restart timer
-                if (window._optionsPanelOpen) return;
-
-                // Short press: restart timer
-                if (Date.now() - lastPressTime < 500) {
-                    if (isPaused) {
-                        handleLongPress();
-                    }
-                    else {
-                        startCountdown();
-                    }
-                    
-                }
-            }
-        }
-
-        // Pointer event listeners (better than mixing mouse/touch)
-        document.body.addEventListener('pointerdown', handlePressStart);
-        document.body.addEventListener('pointerup', handlePressEnd);
-        document.body.addEventListener('pointerleave', handlePressEnd);
-
-        // Options button logic
-        function showOptionsPanel(e) {
-            console.log("showOptionsPanel called");
-            e.stopPropagation();
-            // Do not preventDefault here: allow buttons to work
-            if (!window._optionsPanelOpen) {
-                optionsPanel.classList.add("show");
-                window._optionsPanelOpen = true;
-            }
-        }
-
-        optionsBtn.addEventListener('click', function (e) {
-            console.log("optionsBtn clicked");
-            e.stopPropagation(); // Prevent event from propagating down
-            showOptionsPanel(e);
-        });
-        optionsBtn.addEventListener('pointerup', showOptionsPanel);
-
-        // Prevent global pointerup from closing the menu when interacting with the panel
-        optionsPanel.addEventListener('pointerup', function (e) {
-            e.stopPropagation();
-        });
-
-        optionsPanel.addEventListener('pointerdown', function (e) {
-            e.stopPropagation();
-        });
-
-        optionsPanel.addEventListener('click', function (e) {
-            e.stopPropagation();
-        });
-
-        // Interval input logic
-        intervalInput.addEventListener('change', function () {
-            let val = parseInt(intervalInput.value, 10);
-            if (!isNaN(val) && val >= 5 && val <= 300) {
-                START_TIME = val;
-                countdown = val;
-                timerElement.textContent = countdown;
-            }
-        });
-
-        // OK button logic
-        okBtn.addEventListener('click', function () {
-            let val = parseInt(intervalInput.value, 10);
-            if (!isNaN(val) && val >= 5 && val <= 300) {
-                START_TIME = val;
-                countdown = val;
-                timerElement.textContent = countdown;
-            }
-            optionsState.interval = START_TIME;
-            optionsState.players = playerCheckboxes.map(cb => cb.checked);
-            optionsPanel.classList.remove("show");
-            window._optionsPanelOpen = false;
-        });
-
-        // Cancel button logic
-        cancelBtn.addEventListener('click', function () {
-            intervalInput.value = optionsState.interval;
-            playerCheckboxes.forEach((cb, i) => cb.checked = optionsState.players[i]);
-            optionsPanel.classList.remove("show");
-            window._optionsPanelOpen = false;
-        });
-    </script>
-</body>
-</html>
+    // ===== Timer Logic =====
+    const nextActivePlayer = () => {
+        do {
+            state.currentPlayer = (state.currentPlayer + 1) % 4;
+            state.rotation += 90;
+        } while (!state.p
