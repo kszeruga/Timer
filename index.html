@@ -48,6 +48,10 @@
         color: var(--text-light);
         transition: color 0.2s ease, transform 0.3s ease;
         user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
     }
     #optionsBtn {
         position: absolute;
@@ -99,14 +103,48 @@
     .player-checkbox label {
         margin-left: 0.5em;
     }
-    #intervalInput {
-        width: 60px;
-        font-size: 1em;
-        margin-left: 0.5em;
-        touch-action: manipulation;
-        user-select: text; /* explicitly allow text selection */
-}
+
+    /* New plus/minus buttons container */
+    #intervalControl {
+        margin-top: 1em;
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
     }
+    #intervalControl label {
+        user-select: none;
+    }
+    #decreaseInterval, #increaseInterval {
+        font-size: 1.2em;
+        width: 2em;
+        height: 2em;
+        border: 1px solid #ccc;
+        border-radius: 0.3em;
+        background: white;
+        color: #333;
+        cursor: pointer;
+        user-select: none;
+        transition: background-color 0.2s;
+    }
+    #decreaseInterval:hover, #increaseInterval:hover {
+        background-color: #eafaf1;
+    }
+    #intervalDisplay {
+        min-width: 40px;
+        text-align: center;
+        font-weight: bold;
+        user-select: none;
+    }
+    body.dark #decreaseInterval, body.dark #increaseInterval {
+        background: #333;
+        border-color: #555;
+        color: var(--text-dark);
+    }
+    body.dark #decreaseInterval:hover, body.dark #increaseInterval:hover {
+        background-color: #1a5276;
+        color: white;
+    }
+
     .options-actions {
         display: flex;
         justify-content: space-between;
@@ -182,10 +220,14 @@
     <div class="player-checkbox">
         <input type="checkbox" id="player4"><label for="player4">Gracz D (→)</label>
     </div>
-    <div style="margin-top:1em;">
-        <label for="intervalInput">Czas:</label>
-        <input type="number" id="intervalInput" min="5" max="300" value="40" />
+
+    <div id="intervalControl">
+        <label>Czas:</label>
+        <button type="button" id="decreaseInterval" aria-label="Decrease time">−</button>
+        <span id="intervalDisplay">40</span>
+        <button type="button" id="increaseInterval" aria-label="Increase time">+</button>
     </div>
+
     <div style="margin-top: 1em;">
         <label>
             <input type="checkbox" id="darkThemeToggle" />
@@ -209,7 +251,6 @@
 <script>
 (() => {
 
-    
     // ===== Constants =====
     const LONG_PRESS_MS = 500;
     const MIN_INTERVAL = 5;
@@ -240,7 +281,6 @@
     const timerEl = document.getElementById('timer');
     const optionsBtn = document.getElementById('optionsBtn');
     const optionsPanel = document.getElementById('optionsPanel');
-    const intervalInput = document.getElementById('intervalInput');
     const playerCheckboxes = [
         document.getElementById('player1'),
         document.getElementById('player2'),
@@ -254,6 +294,11 @@
     const darkThemeToggle = document.getElementById('darkThemeToggle');
     const rotate45Toggle = document.getElementById('rotate45Toggle');
 
+    // New interval controls
+    const decreaseBtn = document.getElementById('decreaseInterval');
+    const increaseBtn = document.getElementById('increaseInterval');
+    const intervalDisplay = document.getElementById('intervalDisplay');
+
     // ===== Helpers =====
     const playSound = (audio) => { audio.currentTime = 0; audio.play(); };
     const isValidInterval = (v) => Number.isInteger(v) && v >= MIN_INTERVAL && v <= MAX_INTERVAL;
@@ -264,6 +309,15 @@
     const setStartTime = (val) => {
         state.startTime = val;
         state.countdown = val;
+        timerEl.textContent = val;
+    };
+
+    // Update displayed interval and state when plus/minus pressed or reset
+    const updateIntervalDisplay = (val) => {
+        val = Math.min(Math.max(val, MIN_INTERVAL), MAX_INTERVAL);
+        state.startTime = val;
+        state.countdown = val;
+        intervalDisplay.textContent = val;
         timerEl.textContent = val;
     };
 
@@ -309,8 +363,6 @@
         clearInterval(state.intervalId);
         setStartTime(state.startTime);
 
-
-
         nextActivePlayer();
         state.isPaused = false;
         timerEl.style.opacity = 1;
@@ -346,6 +398,7 @@
     // ===== Event Handlers =====
     const handlePressStart = (e) => {
         if (e.target === optionsBtn || optionsPanel.contains(e.target)) return;
+        e.preventDefault();
         state.lastPressTime = Date.now();
         state.longPressTimeout = setTimeout(() => {
             togglePause();
@@ -355,6 +408,7 @@
 
     const handlePressEnd = (e) => {
         if (e.target === optionsBtn || optionsPanel.contains(e.target)) return;
+        e.preventDefault();
         if (state.longPressTimeout) {
             clearTimeout(state.longPressTimeout);
             state.longPressTimeout = null;
@@ -385,8 +439,6 @@
 
     // ===== Bind Events =====
 
-    
-
     document.body.addEventListener('pointerdown', handlePressStart);
     document.body.addEventListener('pointerup', handlePressEnd);
     document.body.addEventListener('pointerleave', handlePressEnd);
@@ -396,14 +448,16 @@
         showOptionsPanel();
     });
 
-    intervalInput.addEventListener('change', () => {
-        const val = parseInt(intervalInput.value, 10);
-        if (isValidInterval(val)) setStartTime(val);
+    decreaseBtn.addEventListener('click', () => {
+        updateIntervalDisplay(state.startTime - 1);
+    });
+
+    increaseBtn.addEventListener('click', () => {
+        updateIntervalDisplay(state.startTime + 1);
     });
 
     okBtn.addEventListener('click', () => {
-        const val = parseInt(intervalInput.value, 10);
-        if (isValidInterval(val)) setStartTime(val);
+        // startTime already updated by buttons
         savePlayerSelection();
 
         state.rotate45Start = rotate45Toggle.checked;
@@ -414,14 +468,12 @@
     });
 
     cancelBtn.addEventListener('click', () => {
-        intervalInput.value = state.startTime;
+        updateIntervalDisplay(state.startTime);
         loadPlayerSelection();
         loadRotate45Toggle();
         optionsPanel.classList.remove('show');
     });
-    timerEl.addEventListener('contextmenu', e => {
-      e.preventDefault();
-    });
+
     darkThemeToggle.addEventListener('change', () => {
         applyTheme(darkThemeToggle.checked);
     });
@@ -436,13 +488,18 @@
     });
 
     // Close options panel if clicking outside
-    document.body.addEventListener('click', () => {
-        if (isOptionsPanelOpen()) {
+    document.body.addEventListener('click', (e) => {
+        if (isOptionsPanelOpen() && !optionsPanel.contains(e.target)) {
             optionsPanel.classList.remove('show');
         }
     });
 
     optionsPanel.addEventListener('click', e => e.stopPropagation());
+
+    // Prevent context menu on timer (to avoid mobile search popup)
+    timerEl.addEventListener('contextmenu', e => {
+        e.preventDefault();
+    });
 
     // ===== Init =====
     loadPlayerSelection();
@@ -454,11 +511,4 @@
     loadRotate45Toggle();
 
     state.rotation = getInitialRotation();
-    state.currentPlayer = 3; // start from "before" player 0 to let nextActivePlayer move forward
-
-    startCountdown();
-
-})();
-</script>
-</body>
-</html>
+    state.currentPlayer = 3; // start from "before" player 
