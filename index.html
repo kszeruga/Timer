@@ -382,18 +382,8 @@
 
     // ===== Bind Events =====
 
-    document.body.addEventListener('touchstart', e => {
-  e.preventDefault();
-}, { passive: false });
+    
 
-timerEl.addEventListener('touchstart', e => {
-  e.preventDefault();
-}, { passive: false });
-    intervalInput.addEventListener('change', () => {
-  const val = parseInt(intervalInput.value, 10);
-  if (isValidInterval(val)) setStartTime(val);
-  intervalInput.blur(); // Remove focus to avoid keyboard/search popup lingering
-});
     document.body.addEventListener('pointerdown', handlePressStart);
     document.body.addEventListener('pointerup', handlePressEnd);
     document.body.addEventListener('pointerleave', handlePressEnd);
