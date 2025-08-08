@@ -419,7 +419,9 @@
         loadRotate45Toggle();
         optionsPanel.classList.remove('show');
     });
-
+    timerEl.addEventListener('contextmenu', e => {
+      e.preventDefault();
+    });
     darkThemeToggle.addEventListener('change', () => {
         applyTheme(darkThemeToggle.checked);
     });
