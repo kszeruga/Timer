@@ -202,6 +202,7 @@
     const MIN_INTERVAL = 5;
     const MAX_INTERVAL = 300;
     const STORAGE_KEY_THEME = 'countdown_timer_theme';
+    const STORAGE_KEY_ROTATE45 = 'countdown_timer_rotate45';
 
     // Player colors for light and dark themes
     const PLAYER_COLORS_LIGHT = ['#333', '#e74c3c', '#2980b9', '#27ae60'];
@@ -211,7 +212,7 @@
     const state = {
         startTime: 40,
         countdown: 40,
-        rotation: 270, // default rotation start (can be 45 if rotate45Toggle is enabled)
+        rotation: 270, // default rotation start (can be 315 if rotate45Toggle is enabled)
         isPaused: false,
         currentPlayer: 3,
         players: [true, true, true, true],
@@ -219,7 +220,7 @@
         lastPressTime: 0,
         longPressTimeout: null,
         darkTheme: false,
-        rotate45Start: false // NEW toggle for rotate 45° start
+        rotate45Start: false // toggle for rotate 45° start
     };
 
     // ===== Elements =====
@@ -295,7 +296,9 @@
         clearInterval(state.intervalId);
         setStartTime(state.startTime);
 
-        // Set initial rotation depending on rotate45Start
+        // Reset rotation and currentPlayer before cycling through players
+        state.rotation = getInitialRotation() - 90;
+        state.currentPlayer = 3;
 
         nextActivePlayer();
         state.isPaused = false;
@@ -357,9 +360,16 @@
         optionsPanel.classList.add('show');
     };
 
-    // Load rotate45Toggle from state
+    // Load rotate45Toggle from state/localStorage
     const loadRotate45Toggle = () => {
+        const saved = localStorage.getItem(STORAGE_KEY_ROTATE45);
+        state.rotate45Start = saved === 'true';
         rotate45Toggle.checked = state.rotate45Start;
+    };
+
+    // Save rotate45Toggle to localStorage
+    const saveRotate45Toggle = (val) => {
+        localStorage.setItem(STORAGE_KEY_ROTATE45, val ? 'true' : 'false');
     };
 
     // ===== Bind Events =====
@@ -381,7 +391,10 @@
         const val = parseInt(intervalInput.value, 10);
         if (isValidInterval(val)) setStartTime(val);
         savePlayerSelection();
+
         state.rotate45Start = rotate45Toggle.checked;
+        saveRotate45Toggle(state.rotate45Start);
+
         optionsPanel.classList.remove('show');
         if (!state.isPaused) startCountdown();
     });
@@ -399,6 +412,9 @@
 
     rotate45Toggle.addEventListener('change', () => {
         state.rotate45Start = rotate45Toggle.checked;
+        saveRotate45Toggle(state.rotate45Start);
+        state.rotation = getInitialRotation();
+        state.currentPlayer = 3;
         // Restart countdown to apply rotation change immediately if not paused
         if (!state.isPaused) startCountdown();
     });
@@ -420,10 +436,9 @@
     applyTheme(savedTheme === 'dark');
 
     loadRotate45Toggle();
-     state.rotation = getInitialRotation();
 
-        // Set currentPlayer to one behind first to cycle properly
-     state.currentPlayer = 3; // start from "before" player 0 to let nextActivePlayer move forward
+    state.rotation = getInitialRotation();
+    state.currentPlayer = 3; // start from "before" player 0 to let nextActivePlayer move forward
 
     startCountdown();
 
