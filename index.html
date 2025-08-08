@@ -275,7 +275,7 @@
     };
 
     // ===== Rotation helpers =====
-    const getInitialRotation = () => state.rotate45Start ? 45 : 270;
+    const getInitialRotation = () => state.rotate45Start ? 315 : 270;
 
     const nextActivePlayer = () => {
         do {
@@ -296,10 +296,6 @@
         setStartTime(state.startTime);
 
         // Set initial rotation depending on rotate45Start
-        state.rotation = getInitialRotation();
-
-        // Set currentPlayer to one behind first to cycle properly
-        state.currentPlayer = 3; // start from "before" player 0 to let nextActivePlayer move forward
 
         nextActivePlayer();
         state.isPaused = false;
@@ -424,6 +420,10 @@
     applyTheme(savedTheme === 'dark');
 
     loadRotate45Toggle();
+     state.rotation = getInitialRotation();
+
+        // Set currentPlayer to one behind first to cycle properly
+     state.currentPlayer = 3; // start from "before" player 0 to let nextActivePlayer move forward
 
     startCountdown();
 
