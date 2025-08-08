@@ -511,4 +511,13 @@
     loadRotate45Toggle();
 
     state.rotation = getInitialRotation();
-    state.currentPlayer = 3; // start from "before" player 
+    state.currentPlayer = 3; // start from "before" player 0 to let nextActivePlayer move forward
+
+    updateIntervalDisplay(state.startTime);
+
+    startCountdown();
+
+})();
+</script>
+</body>
+</html>
