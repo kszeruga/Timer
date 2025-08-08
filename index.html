@@ -296,9 +296,7 @@
         clearInterval(state.intervalId);
         setStartTime(state.startTime);
 
-        // Reset rotation and currentPlayer before cycling through players
-        state.rotation = getInitialRotation() - 90;
-        state.currentPlayer = 3;
+
 
         nextActivePlayer();
         state.isPaused = false;
