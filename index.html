@@ -181,4 +181,101 @@
         do {
             state.currentPlayer = (state.currentPlayer + 1) % 4;
             state.rotation += 90;
-        } while (!state.p
+        } while (!state.players[state.currentPlayer]);
+        timerEl.style.transform = `translate(-50%, -50%) rotate(${state.rotation}deg)`;
+        timerEl.style.color = PLAYER_COLORS[state.currentPlayer];
+    };
+
+    const startCountdown = () => {
+        if (!state.players.some(Boolean)) {
+            alert("Brak graczy, włącz przynajmniej jednego");
+            return;
+        }
+        clearInterval(state.intervalId);
+        setStartTime(state.startTime);
+        nextActivePlayer();
+        state.isPaused = false;
+        timerEl.style.opacity = 1;
+        optionsBtn.style.display = "none";
+        optionsPanel.classList.remove("show");
+
+        state.intervalId = setInterval(() => {
+            if (!state.isPaused) {
+                state.countdown--;
+                timerEl.textContent = state.countdown;
+                if (state.countdown <= 5 && state.countdown > 0) playSound(tickSound);
+                if (state.countdown <= 0) {
+                    clearInterval(state.intervalId);
+                    timerEl.textContent = 0;
+                    playSound(gongSound);
+                }
+            }
+        }, 1000);
+    };
+
+    const togglePause = () => {
+        state.isPaused = !state.isPaused;
+        timerEl.style.opacity = state.isPaused ? 0.5 : 1;
+        optionsBtn.style.display = state.isPaused ? "block" : "none";
+        if (!state.isPaused) {
+            optionsPanel.classList.remove("show");
+        } else {
+            setStartTime(state.startTime);
+            savePlayerSelection();
+        }
+    };
+
+    // ===== Event Handlers =====
+    const handlePressStart = (e) => {
+        if (e.target === optionsBtn || optionsPanel.contains(e.target)) return;
+        state.lastPressTime = Date.now();
+        state.longPressTimeout = setTimeout(() => {
+            togglePause();
+            state.longPressTimeout = null;
+        }, LONG_PRESS_MS);
+    };
+
+    const handlePressEnd = (e) => {
+        if (e.target === optionsBtn || optionsPanel.contains(e.target)) return;
+        if (state.longPressTimeout) {
+            clearTimeout(state.longPressTimeout);
+            state.longPressTimeout = null;
+            if (isOptionsPanelOpen()) return;
+            if (Date.now() - state.lastPressTime < LONG_PRESS_MS) {
+                if (state.isPaused) togglePause();
+                else startCountdown();
+            }
+        }
+    };
+
+    // ===== Bind Events =====
+    document.body.addEventListener('pointerdown', handlePressStart);
+    document.body.addEventListener('pointerup', handlePressEnd);
+    document.body.addEventListener('pointerleave', handlePressEnd);
+
+    optionsBtn.addEventListener('click', () => optionsPanel.classList.add('show'));
+    intervalInput.addEventListener('change', () => {
+        const val = parseInt(intervalInput.value, 10);
+        if (isValidInterval(val)) setStartTime(val);
+    });
+
+    okBtn.addEventListener('click', () => {
+        const val = parseInt(intervalInput.value, 10);
+        if (isValidInterval(val)) setStartTime(val);
+        savePlayerSelection();
+        optionsPanel.classList.remove('show');
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        intervalInput.value = state.startTime;
+        loadPlayerSelection();
+        optionsPanel.classList.remove('show');
+    });
+
+    // ===== Init =====
+    loadPlayerSelection();
+    startCountdown();
+})();
+</script>
+</body>
+</html>
