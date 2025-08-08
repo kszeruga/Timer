@@ -16,6 +16,14 @@
         --btn-hover-dark: #144a75;
     }
 
+    html, body, #timer, #optionsBtn, #optionsPanel {
+        -webkit-user-select: none; /* Safari */
+        -moz-user-select: none;    /* Firefox */
+        -ms-user-select: none;     /* IE10+ */
+        user-select: none;
+        -webkit-tap-highlight-color: transparent; /* remove tap highlight on mobile */
+        -webkit-touch-callout: none; /* Disable callout on iOS */
+    }
     /* Light theme (default) */
     body {
         font-family: sans-serif;
@@ -197,6 +205,8 @@
 
 <script>
 (() => {
+
+    
     // ===== Constants =====
     const LONG_PRESS_MS = 500;
     const MIN_INTERVAL = 5;
@@ -371,6 +381,19 @@
     };
 
     // ===== Bind Events =====
+
+    document.body.addEventListener('touchstart', e => {
+  e.preventDefault();
+}, { passive: false });
+
+timerEl.addEventListener('touchstart', e => {
+  e.preventDefault();
+}, { passive: false });
+    intervalInput.addEventListener('change', () => {
+  const val = parseInt(intervalInput.value, 10);
+  if (isValidInterval(val)) setStartTime(val);
+  intervalInput.blur(); // Remove focus to avoid keyboard/search popup lingering
+});
     document.body.addEventListener('pointerdown', handlePressStart);
     document.body.addEventListener('pointerup', handlePressEnd);
     document.body.addEventListener('pointerleave', handlePressEnd);
