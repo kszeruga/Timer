@@ -70,7 +70,7 @@
         border-radius: 0.5em;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         padding: 2em;
-        min-width: 150px;
+        min-width: 170px;
         opacity: 0;
         pointer-events: none;
         transition:
@@ -125,7 +125,7 @@
         color: var(--text-dark);
     }
     body.dark #timer {
-        /* color is set dynamically in JS for players */
+        /* color set dynamically via JS */
     }
     body.dark #optionsBtn {
         background: var(--btn-bg-dark);
@@ -148,7 +148,7 @@
         background: #4d1b1b;
     }
 
-    /* Checkbox label colors (unchanged) */
+    /* Player label colors */
     label[for="player1"] { color: #333; }
     label[for="player2"] { color: #e74c3c; }
     label[for="player3"] { color: #2980b9; }
@@ -178,7 +178,13 @@
     <div style="margin-top: 1em;">
         <label>
             <input type="checkbox" id="darkThemeToggle" />
-            Dark Theme
+            Ciemny motyw
+        </label>
+    </div>
+    <div style="margin-top: 1em;">
+        <label>
+            <input type="checkbox" id="rotate45Toggle" />
+            Obróć o 45° 
         </label>
     </div>
     <div class="options-actions">
@@ -205,7 +211,7 @@
     const state = {
         startTime: 40,
         countdown: 40,
-        rotation: 270,
+        rotation: 270, // default rotation start (can be 45 if rotate45Toggle is enabled)
         isPaused: false,
         currentPlayer: 3,
         players: [true, true, true, true],
@@ -213,6 +219,7 @@
         lastPressTime: 0,
         longPressTimeout: null,
         darkTheme: false,
+        rotate45Start: false // NEW toggle for rotate 45° start
     };
 
     // ===== Elements =====
@@ -231,6 +238,7 @@
     const okBtn = document.getElementById('okBtn');
     const cancelBtn = document.getElementById('cancelBtn');
     const darkThemeToggle = document.getElementById('darkThemeToggle');
+    const rotate45Toggle = document.getElementById('rotate45Toggle');
 
     // ===== Helpers =====
     const playSound = (audio) => { audio.currentTime = 0; audio.play(); };
@@ -266,7 +274,9 @@
         timerEl.style.color = getPlayerColor();
     };
 
-    // ===== Timer Logic =====
+    // ===== Rotation helpers =====
+    const getInitialRotation = () => state.rotate45Start ? 45 : 270;
+
     const nextActivePlayer = () => {
         do {
             state.currentPlayer = (state.currentPlayer + 1) % 4;
@@ -276,6 +286,7 @@
         timerEl.style.color = getPlayerColor();
     };
 
+    // ===== Timer Logic =====
     const startCountdown = () => {
         if (!state.players.some(Boolean)) {
             alert("Brak graczy, włącz przynajmniej jednego");
@@ -283,6 +294,13 @@
         }
         clearInterval(state.intervalId);
         setStartTime(state.startTime);
+
+        // Set initial rotation depending on rotate45Start
+        state.rotation = getInitialRotation();
+
+        // Set currentPlayer to one behind first to cycle properly
+        state.currentPlayer = 3; // start from "before" player 0 to let nextActivePlayer move forward
+
         nextActivePlayer();
         state.isPaused = false;
         timerEl.style.opacity = 1;
@@ -343,6 +361,11 @@
         optionsPanel.classList.add('show');
     };
 
+    // Load rotate45Toggle from state
+    const loadRotate45Toggle = () => {
+        rotate45Toggle.checked = state.rotate45Start;
+    };
+
     // ===== Bind Events =====
     document.body.addEventListener('pointerdown', handlePressStart);
     document.body.addEventListener('pointerup', handlePressEnd);
@@ -362,17 +385,26 @@
         const val = parseInt(intervalInput.value, 10);
         if (isValidInterval(val)) setStartTime(val);
         savePlayerSelection();
+        state.rotate45Start = rotate45Toggle.checked;
         optionsPanel.classList.remove('show');
+        if (!state.isPaused) startCountdown();
     });
 
     cancelBtn.addEventListener('click', () => {
         intervalInput.value = state.startTime;
         loadPlayerSelection();
+        loadRotate45Toggle();
         optionsPanel.classList.remove('show');
     });
 
     darkThemeToggle.addEventListener('change', () => {
         applyTheme(darkThemeToggle.checked);
+    });
+
+    rotate45Toggle.addEventListener('change', () => {
+        state.rotate45Start = rotate45Toggle.checked;
+        // Restart countdown to apply rotation change immediately if not paused
+        if (!state.isPaused) startCountdown();
     });
 
     // Close options panel if clicking outside
@@ -390,6 +422,8 @@
     // Load saved theme or default to light
     const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
     applyTheme(savedTheme === 'dark');
+
+    loadRotate45Toggle();
 
     startCountdown();
 
