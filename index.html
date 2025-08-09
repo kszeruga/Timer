@@ -206,6 +206,10 @@
 </head>
 <body>
 <div id="timer">40</div>
+    <div id="instructions" style="display:none; text-align:center; font-size:1.2em;">
+    ▶ krótkie naciśnięcie - start<br>
+    ⏸ długie naciśnięcie - pauza
+</div>
 <button id="optionsBtn">Opcje</button>
 <div id="optionsPanel">
     <div class="player-checkbox">
@@ -383,17 +387,20 @@
         }, 1000);
     };
 
+    const instructionsEl = document.getElementById('instructions');
+
     const togglePause = () => {
         state.isPaused = !state.isPaused;
         timerEl.style.opacity = state.isPaused ? 0.5 : 1;
         optionsBtn.style.display = state.isPaused ? "block" : "none";
+        instructionsEl.style.display = state.isPaused ? "block" : "none";
         if (!state.isPaused) {
             optionsPanel.classList.remove("show");
         } else {
             setStartTime(state.startTime);
             savePlayerSelection();
-        }
-    };
+            }
+        };
 
     // ===== Event Handlers =====
     const handlePressStart = (e) => {
@@ -516,7 +523,8 @@
     updateIntervalDisplay(state.startTime);
 
     startCountdown();
-
+    togglePause();
+    
 })();
 </script>
 </body>
