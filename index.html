@@ -323,19 +323,56 @@
     });
 
     // ===== Events =====
-    let pressTimer;
-    document.body.addEventListener('pointerdown', e => {
-        if (e.target === optionsBtn || optionsPanel.contains(e.target)) return;
-        pressTimer = setTimeout(() => togglePause(), LONG_PRESS_MS);
-    });
-    document.body.addEventListener('pointerup', e => {
-        if (e.target === optionsBtn || optionsPanel.contains(e.target)) return;
-        if (pressTimer) {
-            clearTimeout(pressTimer);
-            if (state.isPaused) togglePause();
-            else startCountdown();
-        }
-    });
+    
+    let pressTimer = null;
+    let longPressed = false;
+    
+    const clearPressTimer = () => {
+      if (pressTimer) {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+      }
+    };
+document.body.addEventListener('pointerdown', e => {
+  if (e.target === optionsBtn || optionsPanel.contains(e.target)) return;
+
+  longPressed = false;
+  clearPressTimer();
+  pressTimer = setTimeout(() => {
+    longPressed = true;
+    // LONG PRESS => toggle pause
+    togglePause();
+    // clear so pointerup doesn't treat it as a short press
+    clearPressTimer();
+  }, LONG_PRESS_MS);
+});
+
+document.body.addEventListener('pointerup', e => {
+  if (e.target === optionsBtn || optionsPanel.contains(e.target)) return;
+
+  // If long press already fired, do nothing on release
+  if (longPressed) {
+    longPressed = false;
+    return;
+  }
+
+  // SHORT PRESS
+  if (pressTimer) {
+    clearPressTimer();
+    if (state.isPaused) togglePause();
+    else startCountdown();
+  }
+});
+
+// Defensive clears if the system cancels the gesture
+document.body.addEventListener('pointerleave', () => {
+  longPressed = false;
+  clearPressTimer();
+});
+document.body.addEventListener('pointercancel', () => {
+  longPressed = false;
+  clearPressTimer();
+});
 
     optionsBtn.addEventListener('click', () => optionsPanel.classList.add('show'));
     decreaseBtn.addEventListener('click', () => updateIntervalDisplay(state.startTime - 1));
