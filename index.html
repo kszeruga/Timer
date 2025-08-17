@@ -310,6 +310,27 @@
     const savePlayerSelection = () => state.players = playerCheckboxes.map(cb => cb.checked);
     const loadPlayerSelection = () => playerCheckboxes.forEach((cb, i) => cb.checked = state.players[i]);
 
+
+    const playBeep = (frequency = 440, duration = 200, type = "sine") => {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+    
+        oscillator.type = type;
+        oscillator.frequency.value = frequency;
+    
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+    
+        // envelope (avoid clicks)
+        gainNode.gain.setValueAtTime(0.0001, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.5, ctx.currentTime + 0.01);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration / 1000);
+    
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + duration / 1000);
+    };
+    
     const setStartTime = (val) => {
         state.startTime = val;
         state.countdown = val;
@@ -325,6 +346,7 @@
         timerEl.textContent = val;
     };
 
+    
     // Return correct player color based on current theme and player
     const getPlayerColor = () => 
         state.darkTheme 
@@ -377,11 +399,11 @@
             if (!state.isPaused) {
                 state.countdown--;
                 timerEl.textContent = state.countdown;
-                if (state.countdown <= 5 && state.countdown > 0) playSound(tickSound);
+                if (state.countdown <= 5 && state.countdown > 0) playBeep(600, 200, "sine");
                 if (state.countdown <= 0) {
                     clearInterval(state.intervalId);
                     timerEl.textContent = 0;
-                    playSound(gongSound);
+                    playBeep(1200, 600, "square");
                 }
             }
         }, 1000);
