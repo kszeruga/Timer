@@ -490,6 +490,7 @@
         saveRotate45Toggle(state.rotate45Start);
         state.rotation = getInitialRotation();
         state.currentPlayer = 3;
+        nextActivePlayer();
         // Restart countdown to apply rotation change immediately if not paused
         if (!state.isPaused) startCountdown();
     });
