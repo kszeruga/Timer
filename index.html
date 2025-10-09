@@ -39,19 +39,34 @@
         overflow: hidden;
         transition: background-color 0.3s ease, color 0.3s ease;
     }
-    #timer {
+    #timer-container {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%) rotate(0deg);
+        transition: transform 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    #timer {
         font-size: 80vmin;
         color: var(--text-light);
-        transition: color 0.2s ease, transform 0.3s ease;
+        transition: color 0.2s ease;
         user-select: none;
         -webkit-touch-callout: none;
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
+    }
+    #player-indicator {
+        font-size: 15vmin;
+        margin-top: 0.3em;
+        opacity: 0.8;
+        font-weight: bold;
+        color: var(--text-light);
+        transition: color 0.2s ease;
+        user-select: none;
     }
     #optionsBtn {
         position: absolute;
@@ -205,8 +220,10 @@
 </style>
 </head>
 <body>
-<div id="timer">40</div>
-<div id="player-indicator" style="text-align:center; font-size:15vmin; margin-top:1em; opacity:0.8; font-weight:bold;"></div>
+<div id="timer-container">
+    <div id="timer">40</div>
+    <div id="player-indicator"></div>
+</div>
     <div id="instructions" style="display:none; text-align:center; font-size:1.2em;">
     ▶ krótkie naciśnięcie - start<br>
     ⏸ długie naciśnięcie - pauza
@@ -283,6 +300,7 @@
     };
 
     // ===== Elements =====
+    const timerContainerEl = document.getElementById('timer-container');
     const timerEl = document.getElementById('timer');
     const playerIndicatorEl = document.getElementById('player-indicator');
     const optionsBtn = document.getElementById('optionsBtn');
@@ -323,8 +341,11 @@
             return;
         }
         const label = PLAYER_LABELS[state.currentPlayer];
+        const color = getPlayerColor();
         playerIndicatorEl.textContent = label;
-        playerIndicatorEl.style.color = getPlayerColor();
+        playerIndicatorEl.style.color = color;
+        // Ensure timer and indicator always have the same color
+        timerEl.style.color = color;
     };
 
     
@@ -363,8 +384,7 @@
         }
         localStorage.setItem(STORAGE_KEY_THEME, dark ? 'dark' : 'light');
 
-        // Update timer color on theme change
-        timerEl.style.color = getPlayerColor();
+        // Update timer and indicator colors on theme change
         updatePlayerIndicator();
     };
 
@@ -376,8 +396,7 @@
             state.currentPlayer = (state.currentPlayer + 1) % 4;
             state.rotation += 90;
         } while (!state.players[state.currentPlayer]);
-        timerEl.style.transform = `translate(-50%, -50%) rotate(${state.rotation}deg)`;
-        timerEl.style.color = getPlayerColor();
+        timerContainerEl.style.transform = `translate(-50%, -50%) rotate(${state.rotation}deg)`;
         updatePlayerIndicator();
     };
 
@@ -545,7 +564,6 @@
     state.currentPlayer = 3; // start from "before" player 0 to let nextActivePlayer move forward
 
     updateIntervalDisplay(state.startTime);
-    updatePlayerIndicator();
 
     startCountdown();
     togglePause();
