@@ -217,6 +217,59 @@
     label[for="player2"] { color: #e74c3c; }
     label[for="player3"] { color: #2980b9; }
     label[for="player4"] { color: #27ae60; }
+
+    /* Seating arrangement selection grid */
+    #seatingGrid {
+        position: absolute;
+        left: 50%;
+        top: 8em;
+        transform: translateX(-50%);
+        display: none;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 0.5em;
+        width: 160px;
+        height: 120px;
+        z-index: 10;
+    }
+    .seating-btn {
+        font-size: 0.9em;
+        font-weight: bold;
+        border: 2px solid #ccc;
+        border-radius: 0.5em;
+        background: white;
+        color: #333;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        user-select: none;
+        padding: 0.3em;
+    }
+    .seating-btn:hover {
+        background: #f0f0f0;
+        transform: scale(1.02);
+    }
+    .seating-btn.active {
+        background: #2980b9;
+        color: white;
+        border-color: #1a5276;
+    }
+    /* Dark theme for seating buttons */
+    body.dark .seating-btn {
+        background: #444;
+        color: #ddd;
+        border-color: #666;
+    }
+    body.dark .seating-btn:hover {
+        background: #555;
+    }
+    body.dark .seating-btn.active {
+        background: #1a5276;
+        color: white;
+        border-color: #144a75;
+    }
 </style>
 </head>
 <body>
@@ -229,6 +282,12 @@
     ⏸ długie naciśnięcie - pauza
 </div>
 <button id="optionsBtn">Opcje</button>
+<div id="seatingGrid">
+    <button class="seating-btn" data-arrangement="ABCD">ABCD</button>
+    <button class="seating-btn" data-arrangement="CBDA">CBDA</button>
+    <button class="seating-btn" data-arrangement="CADB">CADB</button>
+    <button class="seating-btn" data-arrangement="BADC">BADC</button>
+</div>
 <div id="optionsPanel">
     <div class="player-checkbox">
         <input type="checkbox" id="player1"><label for="player1">Gracz A (↓)</label>
@@ -279,6 +338,16 @@
     const MAX_INTERVAL = 300;
     const STORAGE_KEY_THEME = 'countdown_timer_theme';
     const STORAGE_KEY_ROTATE45 = 'countdown_timer_rotate45';
+    const STORAGE_KEY_SEATING = 'countdown_timer_seating';
+
+    // Predefined seating arrangements
+    // Maps player positions (↓←↑→) to player letters (A,B,C,D)
+    const SEATING_ARRANGEMENTS = {
+        'ABCD': ['A', 'B', 'C', 'D'], // A=↓, B=←, C=↑, D=→
+        'CBDA': ['C', 'B', 'D', 'A'], // C=↓, B=←, D=↑, A=→  
+        'CADB': ['C', 'A', 'D', 'B'], // C=↓, A=←, D=↑, B=→
+        'BADC': ['B', 'A', 'D', 'C']  // B=↓, A=←, D=↑, C=→
+    };
 
     // Player colors for light and dark themes
     const PLAYER_COLORS_LIGHT = ['#333', '#e74c3c', '#2980b9', '#27ae60'];
@@ -292,6 +361,7 @@
         isPaused: false,
         currentPlayer: 3,
         players: [true, true, true, true],
+        seatingArrangement: 'ABCD', // Current seating arrangement
         intervalId: null,
         lastPressTime: 0,
         longPressTimeout: null,
@@ -304,6 +374,8 @@
     const timerEl = document.getElementById('timer');
     const playerIndicatorEl = document.getElementById('player-indicator');
     const optionsBtn = document.getElementById('optionsBtn');
+    const seatingGrid = document.getElementById('seatingGrid');
+    const seatingBtns = document.querySelectorAll('.seating-btn');
     const optionsPanel = document.getElementById('optionsPanel');
     const playerCheckboxes = [
         document.getElementById('player1'),
@@ -340,12 +412,42 @@
             playerIndicatorEl.textContent = '';
             return;
         }
-        const label = PLAYER_LABELS[state.currentPlayer];
+        // Get the player letter based on current seating arrangement
+        const currentSeating = SEATING_ARRANGEMENTS[state.seatingArrangement];
+        const label = currentSeating[state.currentPlayer];
         const color = getPlayerColor();
         playerIndicatorEl.textContent = label;
         playerIndicatorEl.style.color = color;
         // Ensure timer and indicator always have the same color
         timerEl.style.color = color;
+    };
+
+    // Update seating arrangement buttons display
+    const updateSeatingButtons = () => {
+        seatingBtns.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.arrangement === state.seatingArrangement);
+        });
+    };
+
+    // Set seating arrangement
+    const setSeatingArrangement = (arrangement) => {
+        if (SEATING_ARRANGEMENTS[arrangement]) {
+            state.seatingArrangement = arrangement;
+            localStorage.setItem(STORAGE_KEY_SEATING, arrangement);
+            updatePlayerIndicator();
+            updateSeatingButtons();
+        }
+    };
+
+    // Load saved seating arrangement
+    const loadSeatingArrangement = () => {
+        const saved = localStorage.getItem(STORAGE_KEY_SEATING);
+        if (saved && SEATING_ARRANGEMENTS[saved]) {
+            state.seatingArrangement = saved;
+        } else {
+            state.seatingArrangement = 'ABCD';
+        }
+        updateSeatingButtons();
     };
 
     
@@ -435,18 +537,20 @@
         state.isPaused = !state.isPaused;
         timerEl.style.opacity = state.isPaused ? 0.5 : 1;
         optionsBtn.style.display = state.isPaused ? "block" : "none";
+        seatingGrid.style.display = state.isPaused ? "grid" : "none";
         instructionsEl.style.display = state.isPaused ? "block" : "none";
         if (!state.isPaused) {
             optionsPanel.classList.remove("show");
         } else {
             setStartTime(state.startTime);
             savePlayerSelection();
+            updateSeatingButtons();
             }
         };
 
     // ===== Event Handlers =====
     const handlePressStart = (e) => {
-        if (e.target === optionsBtn || optionsPanel.contains(e.target)) return;
+        if (e.target === optionsBtn || optionsPanel.contains(e.target) || seatingGrid.contains(e.target)) return;
         e.preventDefault();
         state.lastPressTime = Date.now();
         state.longPressTimeout = setTimeout(() => {
@@ -456,7 +560,7 @@
     };
 
     const handlePressEnd = (e) => {
-        if (e.target === optionsBtn || optionsPanel.contains(e.target)) return;
+        if (e.target === optionsBtn || optionsPanel.contains(e.target) || seatingGrid.contains(e.target)) return;
         e.preventDefault();
         if (state.longPressTimeout) {
             clearTimeout(state.longPressTimeout);
@@ -503,6 +607,15 @@
 
     increaseBtn.addEventListener('click', () => {
         updateIntervalDisplay(state.startTime + 1);
+    });
+
+    // Seating arrangement button event handlers
+    seatingBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const arrangement = btn.dataset.arrangement;
+            setSeatingArrangement(arrangement);
+        });
     });
 
     okBtn.addEventListener('click', () => {
@@ -559,6 +672,7 @@
     applyTheme(savedTheme === 'dark');
 
     loadRotate45Toggle();
+    loadSeatingArrangement();
 
     state.rotation = getInitialRotation();
     state.currentPlayer = 3; // start from "before" player 0 to let nextActivePlayer move forward
