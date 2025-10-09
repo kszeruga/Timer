@@ -222,7 +222,7 @@
     #seatingGrid {
         position: absolute;
         left: 50%;
-        top: 8em;
+        top: 12em;
         transform: translateX(-50%);
         display: none;
         grid-template-columns: 1fr 1fr;
@@ -233,7 +233,7 @@
         z-index: 10;
     }
     .seating-btn {
-        font-size: 0.9em;
+        font-size: 0.8em;
         font-weight: bold;
         border: 2px solid #ccc;
         border-radius: 0.5em;
@@ -245,7 +245,8 @@
         align-items: center;
         justify-content: center;
         user-select: none;
-        padding: 0.3em;
+        padding: 0.5em;
+        position: relative;
     }
     .seating-btn:hover {
         background: #f0f0f0;
@@ -256,6 +257,31 @@
         color: white;
         border-color: #1a5276;
     }
+    .table-visual {
+        position: relative;
+        width: 30px;
+        height: 30px;
+    }
+    .table-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 16px;
+        height: 16px;
+        background: #666;
+        border-radius: 2px;
+    }
+    .player-pos {
+        position: absolute;
+        font-size: 0.7em;
+        font-weight: bold;
+        color: inherit;
+    }
+    .player-pos.bottom { bottom: -2px; left: 50%; transform: translateX(-50%); }
+    .player-pos.left { left: -2px; top: 50%; transform: translateY(-50%); }
+    .player-pos.top { top: -2px; left: 50%; transform: translateX(-50%); }
+    .player-pos.right { right: -2px; top: 50%; transform: translateY(-50%); }
     /* Dark theme for seating buttons */
     body.dark .seating-btn {
         background: #444;
@@ -270,6 +296,9 @@
         color: white;
         border-color: #144a75;
     }
+    body.dark .table-center {
+        background: #aaa;
+    }
 </style>
 </head>
 <body>
@@ -283,10 +312,42 @@
 </div>
 <button id="optionsBtn">Opcje</button>
 <div id="seatingGrid">
-    <button class="seating-btn" data-arrangement="ABCD">ABCD</button>
-    <button class="seating-btn" data-arrangement="CBDA">CBDA</button>
-    <button class="seating-btn" data-arrangement="CADB">CADB</button>
-    <button class="seating-btn" data-arrangement="BADC">BADC</button>
+    <button class="seating-btn" data-arrangement="ABCD">
+        <div class="table-visual">
+            <div class="table-center"></div>
+            <div class="player-pos bottom">A</div>
+            <div class="player-pos left">B</div>
+            <div class="player-pos top">C</div>
+            <div class="player-pos right">D</div>
+        </div>
+    </button>
+    <button class="seating-btn" data-arrangement="CBDA">
+        <div class="table-visual">
+            <div class="table-center"></div>
+            <div class="player-pos bottom">C</div>
+            <div class="player-pos left">B</div>
+            <div class="player-pos top">D</div>
+            <div class="player-pos right">A</div>
+        </div>
+    </button>
+    <button class="seating-btn" data-arrangement="CADB">
+        <div class="table-visual">
+            <div class="table-center"></div>
+            <div class="player-pos bottom">C</div>
+            <div class="player-pos left">A</div>
+            <div class="player-pos top">D</div>
+            <div class="player-pos right">B</div>
+        </div>
+    </button>
+    <button class="seating-btn" data-arrangement="BADC">
+        <div class="table-visual">
+            <div class="table-center"></div>
+            <div class="player-pos bottom">B</div>
+            <div class="player-pos left">A</div>
+            <div class="player-pos top">D</div>
+            <div class="player-pos right">C</div>
+        </div>
+    </button>
 </div>
 <div id="optionsPanel">
     <div class="player-checkbox">
