@@ -206,6 +206,7 @@
 </head>
 <body>
 <div id="timer">40</div>
+<div id="player-indicator" style="text-align:center; font-size:15vmin; margin-top:1em; opacity:0.8; font-weight:bold;"></div>
     <div id="instructions" style="display:none; text-align:center; font-size:1.2em;">
     ▶ krótkie naciśnięcie - start<br>
     ⏸ długie naciśnięcie - pauza
@@ -283,6 +284,7 @@
 
     // ===== Elements =====
     const timerEl = document.getElementById('timer');
+    const playerIndicatorEl = document.getElementById('player-indicator');
     const optionsBtn = document.getElementById('optionsBtn');
     const optionsPanel = document.getElementById('optionsPanel');
     const playerCheckboxes = [
@@ -310,13 +312,27 @@
     const savePlayerSelection = () => state.players = playerCheckboxes.map(cb => cb.checked);
     const loadPlayerSelection = () => playerCheckboxes.forEach((cb, i) => cb.checked = state.players[i]);
 
+    // Player labels
+    const PLAYER_LABELS = ['A', 'B', 'C', 'D'];
 
+    // Update the player indicator below the timer
+    const updatePlayerIndicator = () => {
+        // Only show for enabled players
+        if (!state.players.some(Boolean)) {
+            playerIndicatorEl.textContent = '';
+            return;
+        }
+        const label = PLAYER_LABELS[state.currentPlayer];
+        playerIndicatorEl.textContent = label;
+        playerIndicatorEl.style.color = getPlayerColor();
+    };
 
     
     const setStartTime = (val) => {
         state.startTime = val;
         state.countdown = val;
         timerEl.textContent = val;
+        updatePlayerIndicator();
     };
 
     // Update displayed interval and state when plus/minus pressed or reset
@@ -326,6 +342,7 @@
         state.countdown = val;
         intervalDisplay.textContent = val;
         timerEl.textContent = val;
+        updatePlayerIndicator();
     };
 
     
@@ -348,6 +365,7 @@
 
         // Update timer color on theme change
         timerEl.style.color = getPlayerColor();
+        updatePlayerIndicator();
     };
 
     // ===== Rotation helpers =====
@@ -360,6 +378,7 @@
         } while (!state.players[state.currentPlayer]);
         timerEl.style.transform = `translate(-50%, -50%) rotate(${state.rotation}deg)`;
         timerEl.style.color = getPlayerColor();
+        updatePlayerIndicator();
     };
 
     // ===== Timer Logic =====
@@ -526,6 +545,7 @@
     state.currentPlayer = 3; // start from "before" player 0 to let nextActivePlayer move forward
 
     updateIntervalDisplay(state.startTime);
+    updatePlayerIndicator();
 
     startCountdown();
     togglePause();
