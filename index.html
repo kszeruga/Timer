@@ -282,6 +282,18 @@
     .player-pos.left { left: -0.4em; top: 50%; transform: translateY(-50%); }
     .player-pos.top { top: -0.6em; left: 50%; transform: translateX(-50%); }
     .player-pos.right { right: -0.4em; top: 50%; transform: translateY(-50%); }
+    .btn-label {
+        position: absolute;
+        top: 0.2em;
+        left: 0.2em;
+        font-size: 0.9em;
+        font-weight: bold;
+        color: #666;
+        background: white;
+        border-radius: 2px;
+        padding: 0.1em 0.3em;
+        line-height: 1;
+    }
     /* Dark theme for seating buttons */
     body.dark .seating-btn {
         background: #444;
@@ -299,6 +311,10 @@
     body.dark .table-center {
         background: #aaa;
     }
+    body.dark .btn-label {
+        color: #ddd;
+        background: #333;
+    }
 </style>
 </head>
 <body>
@@ -313,6 +329,7 @@
 <button id="optionsBtn">Opcje</button>
 <div id="seatingGrid">
     <button class="seating-btn" data-arrangement="ABCD">
+        <div class="btn-label">1</div>
         <div class="table-visual">
             <div class="table-center"></div>
             <div class="player-pos bottom">A</div>
@@ -322,6 +339,7 @@
         </div>
     </button>
     <button class="seating-btn" data-arrangement="CBDA">
+        <div class="btn-label">2</div>
         <div class="table-visual">
             <div class="table-center"></div>
             <div class="player-pos bottom">C</div>
@@ -331,6 +349,7 @@
         </div>
     </button>
     <button class="seating-btn" data-arrangement="CADB">
+        <div class="btn-label">3</div>
         <div class="table-visual">
             <div class="table-center"></div>
             <div class="player-pos bottom">C</div>
@@ -340,6 +359,7 @@
         </div>
     </button>
     <button class="seating-btn" data-arrangement="BADC">
+        <div class="btn-label">4</div>
         <div class="table-visual">
             <div class="table-center"></div>
             <div class="player-pos bottom">B</div>
