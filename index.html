@@ -349,9 +349,9 @@
         'BADC': ['B', 'A', 'D', 'C']  // B=↓, A=←, D=↑, C=→
     };
 
-    // Player colors for light and dark themes
-    const PLAYER_COLORS_LIGHT = ['#333', '#e74c3c', '#2980b9', '#27ae60'];
-    const PLAYER_COLORS_DARK = ['#bbb', '#ff6b6b', '#5dade2', '#58d68d'];
+    // Player colors for light and dark themes - indexed by letter A=0, B=1, C=2, D=3
+    const PLAYER_COLORS_LIGHT = ['#333', '#e74c3c', '#2980b9', '#27ae60']; // A=black, B=red, C=blue, D=green
+    const PLAYER_COLORS_DARK = ['#bbb', '#ff6b6b', '#5dade2', '#58d68d'];   // A=light gray, B=light red, C=light blue, D=light green
 
     // ===== State =====
     const state = {
@@ -469,11 +469,17 @@
     };
 
     
-    // Return correct player color based on current theme and player
-    const getPlayerColor = () => 
-        state.darkTheme 
-            ? PLAYER_COLORS_DARK[state.currentPlayer] 
-            : PLAYER_COLORS_LIGHT[state.currentPlayer];
+    // Return correct player color based on current theme and player letter
+    const getPlayerColor = () => {
+        // Get the current player letter based on seating arrangement
+        const currentSeating = SEATING_ARRANGEMENTS[state.seatingArrangement];
+        const playerLetter = currentSeating[state.currentPlayer];
+        // Convert letter to index: A=0, B=1, C=2, D=3
+        const colorIndex = playerLetter.charCodeAt(0) - 'A'.charCodeAt(0);
+        return state.darkTheme 
+            ? PLAYER_COLORS_DARK[colorIndex] 
+            : PLAYER_COLORS_LIGHT[colorIndex];
+    };
 
     const applyTheme = (dark) => {
         state.darkTheme = dark;
