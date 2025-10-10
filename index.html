@@ -528,10 +528,11 @@
             // Find the position of the target player in this arrangement
             const currentSeating = SEATING_ARRANGEMENTS[arrangement];
             
-            // Update rotation to match the current player position
-            state.rotation = getInitialRotation() + (state.currentPlayer * 90);
-            timerContainerEl.style.transform = `translate(-50%, -50%) rotate(${state.rotation}deg)`;
-            
+            state.rotation = getInitialRotation();
+            do {
+                state.currentPlayer = (state.currentPlayer + 1) % 4;
+                state.rotation += 90;
+            } while (state.players[state.currentPlayer] && currentSeating[state.currentPlayer] !== targetPlayer);
             updatePlayerIndicator();
             updateSeatingButtons();
         }
