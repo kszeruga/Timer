@@ -527,7 +527,6 @@
             
             // Find the position of the target player in this arrangement
             const currentSeating = SEATING_ARRANGEMENTS[arrangement];
-            state.currentPlayer = currentSeating.indexOf(targetPlayer);
             
             // Update rotation to match the current player position
             state.rotation = getInitialRotation() + (state.currentPlayer * 90);
