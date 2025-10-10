@@ -518,21 +518,6 @@
         if (SEATING_ARRANGEMENTS[arrangement]) {
             state.seatingArrangement = arrangement;
             localStorage.setItem(STORAGE_KEY_SEATING, arrangement);
-            
-            // Set current player based on arrangement: find where the target player sits
-            const targetPlayers = ['A', 'B', 'C', 'D']; // Button 1->A, 2->B, 3->C, 4->D
-            const arrangementOrder = ['ABCD', 'CBDA', 'CADB', 'BADC'];
-            const arrangementIndex = arrangementOrder.indexOf(arrangement);
-            const targetPlayer = targetPlayers[arrangementIndex];
-            
-            // Find the position of the target player in this arrangement
-            const currentSeating = SEATING_ARRANGEMENTS[arrangement];
-            
-            state.rotation = getInitialRotation();
-            do {
-                state.currentPlayer = (state.currentPlayer + 1) % 4;
-                state.rotation += 90;
-            } while (state.players[state.currentPlayer] && currentSeating[state.currentPlayer] !== targetPlayer);
             updatePlayerIndicator();
             updateSeatingButtons();
         }
