@@ -519,14 +519,15 @@
             state.seatingArrangement = arrangement;
             localStorage.setItem(STORAGE_KEY_SEATING, arrangement);
             
-            // Set current player based on arrangement: ABCD->A, CBDA->B, CADB->C, BADC->D
-            const arrangementToPlayer = {
-                'ABCD': 0, // A
-                'CBDA': 1, // B
-                'CADB': 0, // C
-                'BADC': 2  // D
-            };
-            state.currentPlayer = arrangementToPlayer[arrangement];
+            // Set current player based on arrangement: find where the target player sits
+            const targetPlayers = ['A', 'B', 'C', 'D']; // Button 1->A, 2->B, 3->C, 4->D
+            const arrangementOrder = ['ABCD', 'CBDA', 'CADB', 'BADC'];
+            const arrangementIndex = arrangementOrder.indexOf(arrangement);
+            const targetPlayer = targetPlayers[arrangementIndex];
+            
+            // Find the position of the target player in this arrangement
+            const currentSeating = SEATING_ARRANGEMENTS[arrangement];
+            state.currentPlayer = currentSeating.indexOf(targetPlayer);
             
             updatePlayerIndicator();
             updateSeatingButtons();
