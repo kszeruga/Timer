@@ -1,1136 +1,1316 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
-<title>Countdown Timer</title>
-<style>
-    :root {
-        --bg-light: white;
-        --bg-dark: #222;
-        --text-light: #333;
-        --text-dark: #ddd;
-        --btn-bg-light: #2980b9;
-        --btn-bg-dark: #1a5276;
-        --btn-hover-light: #eafaf1;
-        --btn-hover-dark: #144a75;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+    <title>Countdown Timer</title>
+    <style>
+        :root {
+            --bg-light: white;
+            --bg-dark: #222;
+            --text-light: #333;
+            --text-dark: #ddd;
+            --btn-bg-light: #2980b9;
+            --btn-bg-dark: #1a5276;
+            --btn-hover-light: #eafaf1;
+            --btn-hover-dark: #144a75;
+        }
 
-    html, body, #timer {
-        -webkit-user-select: none; /* Safari */
-        -moz-user-select: none;    /* Firefox */
-        -ms-user-select: none;     /* IE10+ */
-        user-select: none;
-        -webkit-tap-highlight-color: transparent; /* remove tap highlight on mobile */
-        -webkit-touch-callout: none; /* Disable callout on iOS */
-    }
-    /* Light theme (default) */
-    body {
-        font-family: sans-serif;
-        cursor: pointer;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-        touch-action: manipulation;
-        background-color: var(--bg-light);
-        color: var(--text-light);
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        overflow: hidden;
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
-    #timer-container {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) rotate(0deg);
-        transition: transform 0.3s ease;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    #timer {
-        font-size: 75vmin;
-        color: var(--text-light);
-        transition: color 0.2s ease;
-        user-select: none;
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-    }
-    #player-indicator {
-        font-size: 18vmin;
-        margin-top: -0.5em;
-        opacity: 0.8;
-        font-weight: bold;
-        color: var(--text-light);
-        transition: color 0.2s ease;
-        user-select: none; 
-    }
-    .top-btns {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 1.2em;
-        position: absolute;
-        left: 50%;
-        top: 2em;
-        transform: translateX(-50%);
-        z-index: 10;
-    }
-    .top-btns button {
-        font-size: 1.8em;
-        padding: 0.4em 0.8em;
-        background: var(--btn-bg-light);
-        color: #fff;
-        border: none;
-        border-radius: 0.5em;
-        cursor: pointer;
-        display: none;
-        transition: background-color 0.3s ease;
-        height: 2.6em;
-        min-width: 2.6em;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    #optionsBtn:hover {
-        background-color: var(--btn-hover-light);
-    }
-    #seatingToggleBtn:hover {
-        background-color: var(--btn-hover-light);
-    }
-    #fullscreenBtn:hover {
-        background-color: var(--btn-hover-light);
-    }
-    #optionsPanel {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%) translateY(-10px);
-        background: var(--bg-light);
-        border: 1px solid #ccc;
-        border-radius: 0.5em;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        padding: 2em;
-        min-width: 220px;
-        opacity: 0;
-        pointer-events: none;
-        transition:
-            opacity 0.3s ease,
-            transform 0.3s ease;
-        z-index: 10;
-    }
-    #optionsPanel.show {
-        opacity: 1;
-        pointer-events: auto;
-        transform: translate(-50%, -50%) translateY(0);
-    }
-    
-    /* Section styling for better organization */
-    .options-section {
-        margin-bottom: 1.5em;
-    }
-    .options-section:last-child {
-        margin-bottom: 0;
-    }
-    .section-title {
-        font-weight: 600;
-        margin-bottom: 0.8em;
-        color: var(--text-light);
-        font-size: 0.9em;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .player-checkbox {
-        margin-bottom: 0.7em;
-        display: flex;
-        align-items: center;
-    }
-    .player-checkbox label {
-        margin-left: 0.7em;
-        min-height: 1.7em;
-        display: flex;
-        align-items: center;
-        font-weight: 500;
-    }
-    .arrow-label {
-        font-family: 'Consolas', 'Menlo', 'Monaco', 'Liberation Mono', monospace;
-        display: inline-block;
-        width: 1.2em;
-        text-align: center;
-    }
+        html,
+        body,
+        #timer {
+            -webkit-user-select: none;
+            /* Safari */
+            -moz-user-select: none;
+            /* Firefox */
+            -ms-user-select: none;
+            /* IE10+ */
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            /* remove tap highlight on mobile */
+            -webkit-touch-callout: none;
+            /* Disable callout on iOS */
+        }
 
-    /* New plus/minus buttons container */
-    #intervalControl {
-        margin-top: 0;
-        display: flex;
-        align-items: center;
-        gap: 0.7em;
-        justify-content: space-between;
-    }
-    #intervalControl label {
-        user-select: none;
-        font-weight: 500;
-        min-width: 40px;
-    }
-    #decreaseInterval, #increaseInterval {
-        font-size: 1.2em;
-        width: 2.2em;
-        height: 2.2em;
-        border: 1px solid #ccc;
-        border-radius: 0.4em;
-        background: white;
-        color: #333;
-        cursor: pointer;
-        user-select: none;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-    }
-    #decreaseInterval:hover, #increaseInterval:hover {
-        background-color: #eafaf1;
-        border-color: #2980b9;
-        transform: scale(1.05);
-    }
-    #intervalDisplay {
-        min-width: 50px;
-        text-align: center;
-        font-weight: bold;
-        user-select: none;
-        font-size: 1.1em;
-        padding: 0.2em 0.5em;
-        background: var(--bg-light);
-        border-radius: 0.3em;
-        border: 1px solid #eee;
-    }
-    body.dark #decreaseInterval, body.dark #increaseInterval {
-        background: #333;
-        border-color: #555;
-        color: var(--text-dark);
-    }
-    body.dark #decreaseInterval:hover, body.dark #increaseInterval:hover {
-        background-color: #1a5276;
-        color: white;
-        border-color: #5dade2;
-    }
-    body.dark #intervalDisplay {
-        background: #333;
-        border-color: #555;
-        color: var(--text-dark);
-    }
-    body.dark .section-title {
-        color: var(--text-dark);
-    }
+        /* Light theme (default) */
+        body {
+            font-family: sans-serif;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
 
-    .options-actions {
-        display: flex;
-        justify-content: center;
-        gap: 1em;
-        margin-top: 2em;
-    }
-    .icon-btn {
-        font-size: 1.8em;
-        padding: 0.2em 0.6em;
-        border: none;
-        border-radius: 0.4em;
-        cursor: pointer;
-        background: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background 0.2s;
-    }
-    #okBtn { color: #27ae60; }
-    #okBtn:hover { background: #eafaf1; }
-    #cancelBtn { color: #e74c3c; }
-    #cancelBtn:hover { background: #fdeaea; }
+        #timer-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(0deg);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-    /* Dark theme */
-    body.dark {
-        background-color: var(--bg-dark);
-        color: var(--text-dark);
-    }
-    body.dark #optionsBtn {
-        background: var(--btn-bg-dark);
-    }
-    body.dark #seatingToggleBtn {
-        background: var(--btn-bg-dark);
-    }
-    body.dark #fullscreenBtn {
-        background: var(--btn-bg-dark);
-    }
-    body.dark #optionsBtn:hover {
-        background-color: var(--btn-hover-dark);
-    }
-    body.dark #seatingToggleBtn:hover {
-        background-color: var(--btn-hover-dark);
-    }
-    body.dark #fullscreenBtn:hover {
-        background-color: var(--btn-hover-dark);
-    }
-    body.dark #optionsPanel {
-        background: #333;
-        border-color: #555;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.7);
-    }
-    body.dark .player-checkbox label {
-        color: var(--text-dark);
-    }
-    body.dark #okBtn:hover {
-        background: #1b3e20;
-    }
-    body.dark #cancelBtn:hover {
-        background: #4d1b1b;
-    }
+        #timer {
+            font-size: 75vmin;
+            color: var(--text-light);
+            transition: color 0.2s ease;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
 
-    /* Instructions at bottom */
-    #instructions {
-        position: fixed;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        margin: 0 auto;
-        padding: 0.7em 0;
-        background: rgba(255,255,255,0.95);
-        z-index: 20;
-        border-top: 1px solid #eee;
-        text-align: center;
-        font-size: 1.2em;
-        transition: background 0.3s;
-    }
-    body.dark #instructions {
-        background: rgba(34,34,34,0.97);
-        border-top: 1px solid #444;
-        color: var(--text-dark);
-    }
+        #player-indicator {
+            font-size: 18vmin;
+            margin-top: -0.5em;
+            opacity: 0.8;
+            font-weight: bold;
+            color: var(--text-light);
+            transition: color 0.2s ease;
+            user-select: none;
+        }
 
-    /* Player label colors */
-    label[for="player1"] { color: #333; }
-    label[for="player2"] { color: #e74c3c; }
-    label[for="player3"] { color: #2980b9; }
-    label[for="player4"] { color: #27ae60; }
+        .top-btns {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.2em;
+            position: absolute;
+            left: 50%;
+            top: 2em;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
 
-    /* Seating arrangement selection grid */
-    #seatingGrid {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%) translateY(-10px);
-        background: var(--bg-light);
-        border: 1px solid #ccc;
-        border-radius: 0.5em;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        padding: 2em;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr auto;
-        gap: 0.5em;
-        width: 200px;
-        height: 160px;
-        z-index: 10;
-        opacity: 0;
-        pointer-events: none;
-        transition:
-            opacity 0.3s ease,
-            transform 0.3s ease;
-    }
-    #seatingGrid.show {
-        display: grid;
-        opacity: 1;
-        pointer-events: auto;
-        transform: translate(-50%, -50%) translateY(0);
-    }
-    .seating-btn {
-        font-size: 0.8em;
-        font-weight: bold;
-        border: 2px solid #ccc;
-        border-radius: 0.5em;
-        background: white;
-        color: #333;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        user-select: none;
-        padding: 0.8em;
-        position: relative;
-    }
-    .seating-btn:hover {
-        background: #f0f0f0;
-        transform: scale(1.02);
-    }
-    .seating-btn.active {
-        background: #2980b9;
-        color: white;
-        border-color: #1a5276;
-    }
-    .table-visual {
-        position: relative;
-        width: 2.5em;
-        height: 2.5em;
-    }
-    .table-center {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 1.1em;
-        height: 1.1em;
-        background: #666;
-        border-radius: 2px;
-    }
-    .player-pos {
-        position: absolute;
-        font-size: 1.2em;
-        font-weight: normal;
-        color: inherit;
-    }
-    .player-pos.bottom { bottom: -0.6em; left: 50%; transform: translateX(-50%); }
-    .player-pos.left { left: -0.4em; top: 50%; transform: translateY(-50%); }
-    .player-pos.top { top: -0.6em; left: 50%; transform: translateX(-50%); }
-    .player-pos.right { right: -0.4em; top: 50%; transform: translateY(-50%); }
-    .player-pos.bold {
-        font-weight: bold;
-    }
-    .btn-label {
-        position: absolute;
-        top: 0.2em;
-        left: 0.2em;
-        font-size: 0.9em;
-        font-weight: bold;
-        color: #666;
-        background: white;
-        border-radius: 2px;
-        padding: 0.1em 0.3em;
-        line-height: 1;
-    }
-    /* Dark theme for seating buttons */
-    body.dark .seating-btn {
-        background: #444;
-        color: #ddd;
-        border-color: #666;
-    }
-    body.dark .seating-btn:hover {
-        background: #555;
-    }
-    body.dark .seating-btn.active {
-        background: #1a5276;
-        color: white;
-        border-color: #144a75;
-    }
-    body.dark .table-center {
-        background: #aaa;
-    }
-    body.dark .btn-label {
-        color: #ddd;
-        background: #333;
-    }
-    /* Dark theme for seating grid panel */
-    body.dark #seatingGrid {
-        background: #333;
-        border-color: #555;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.7);
-    }
+        .top-btns button {
+            font-size: 1.8em;
+            padding: 0.4em 0.8em;
+            background: var(--btn-bg-light);
+            color: #fff;
+            border: none;
+            border-radius: 0.5em;
+            cursor: pointer;
+            display: none;
+            transition: background-color 0.3s ease;
+            height: 2.6em;
+            min-width: 2.6em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    #seatingGrid .seating-ok-row {
-        grid-column: 1 / span 2;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        margin-top: 1em;
-    }
-    #seatingOkBtn {
-      margin: 0;
-      color: #27ae60;
-    }
-</style>
+        #optionsBtn:hover {
+            background-color: var(--btn-hover-light);
+        }
+
+        #seatingToggleBtn:hover {
+            background-color: var(--btn-hover-light);
+        }
+
+        #fullscreenBtn:hover {
+            background-color: var(--btn-hover-light);
+        }
+
+        #optionsPanel {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) translateY(-10px);
+            background: var(--bg-light);
+            border: 1px solid #ccc;
+            border-radius: 0.5em;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 2em;
+            min-width: 220px;
+            opacity: 0;
+            pointer-events: none;
+            transition:
+                opacity 0.3s ease,
+                transform 0.3s ease;
+            z-index: 10;
+        }
+
+        #optionsPanel.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) translateY(0);
+        }
+
+        /* Section styling for better organization */
+        .options-section {
+            margin-bottom: 1.5em;
+        }
+
+        .options-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 0.8em;
+            color: var(--text-light);
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .player-checkbox {
+            margin-bottom: 0.7em;
+            display: flex;
+            align-items: center;
+        }
+
+        .player-checkbox label {
+            margin-left: 0.7em;
+            min-height: 1.7em;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .arrow-label {
+            font-family: 'Consolas', 'Menlo', 'Monaco', 'Liberation Mono', monospace;
+            display: inline-block;
+            width: 1.2em;
+            text-align: center;
+        }
+
+        /* New plus/minus buttons container */
+        #intervalControl {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.7em;
+            justify-content: space-between;
+        }
+
+        #intervalControl label {
+            user-select: none;
+            font-weight: 500;
+            min-width: 40px;
+        }
+
+        #decreaseInterval,
+        #increaseInterval {
+            font-size: 1.2em;
+            width: 2.2em;
+            height: 2.2em;
+            border: 1px solid #ccc;
+            border-radius: 0.4em;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        #decreaseInterval:hover,
+        #increaseInterval:hover {
+            background-color: #eafaf1;
+            border-color: #2980b9;
+            transform: scale(1.05);
+        }
+
+        #intervalDisplay {
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+            user-select: none;
+            font-size: 1.1em;
+            padding: 0.2em 0.5em;
+            background: var(--bg-light);
+            border-radius: 0.3em;
+            border: 1px solid #eee;
+        }
+
+        body.dark #decreaseInterval,
+        body.dark #increaseInterval {
+            background: #333;
+            border-color: #555;
+            color: var(--text-dark);
+        }
+
+        body.dark #decreaseInterval:hover,
+        body.dark #increaseInterval:hover {
+            background-color: #1a5276;
+            color: white;
+            border-color: #5dade2;
+        }
+
+        body.dark #intervalDisplay {
+            background: #333;
+            border-color: #555;
+            color: var(--text-dark);
+        }
+
+        body.dark .section-title {
+            color: var(--text-dark);
+        }
+
+        .options-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1em;
+            margin-top: 2em;
+        }
+
+        .icon-btn {
+            font-size: 1.8em;
+            padding: 0.2em 0.6em;
+            border: none;
+            border-radius: 0.4em;
+            cursor: pointer;
+            background: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        #okBtn {
+            color: #27ae60;
+        }
+
+        #okBtn:hover {
+            background: #eafaf1;
+        }
+
+        #cancelBtn {
+            color: #e74c3c;
+        }
+
+        #cancelBtn:hover {
+            background: #fdeaea;
+        }
+
+        /* Dark theme */
+        body.dark {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        body.dark #optionsBtn {
+            background: var(--btn-bg-dark);
+        }
+
+        body.dark #seatingToggleBtn {
+            background: var(--btn-bg-dark);
+        }
+
+        body.dark #fullscreenBtn {
+            background: var(--btn-bg-dark);
+        }
+
+        body.dark #optionsBtn:hover {
+            background-color: var(--btn-hover-dark);
+        }
+
+        body.dark #seatingToggleBtn:hover {
+            background-color: var(--btn-hover-dark);
+        }
+
+        body.dark #fullscreenBtn:hover {
+            background-color: var(--btn-hover-dark);
+        }
+
+        body.dark #optionsPanel {
+            background: #333;
+            border-color: #555;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+        }
+
+        body.dark .player-checkbox label {
+            color: var(--text-dark);
+        }
+
+        body.dark #okBtn:hover {
+            background: #1b3e20;
+        }
+
+        body.dark #cancelBtn:hover {
+            background: #4d1b1b;
+        }
+
+        /* Instructions at bottom */
+        #instructions {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: 0 auto;
+            padding: 0.7em 0;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 20;
+            border-top: 1px solid #eee;
+            text-align: center;
+            font-size: 1.2em;
+            transition: background 0.3s;
+        }
+
+        body.dark #instructions {
+            background: rgba(34, 34, 34, 0.97);
+            border-top: 1px solid #444;
+            color: var(--text-dark);
+        }
+
+        /* Player label colors */
+        label[for="player1"] {
+            color: #333;
+        }
+
+        label[for="player2"] {
+            color: #e74c3c;
+        }
+
+        label[for="player3"] {
+            color: #2980b9;
+        }
+
+        label[for="player4"] {
+            color: #27ae60;
+        }
+
+        label[for="player5"] {
+            color: #8e44ad;
+        }
+
+        label[for="player6"] {
+            color: #f39c12;
+        }
+
+        /* Seating arrangement selection grid */
+        #seatingGrid {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) translateY(-10px);
+            background: var(--bg-light);
+            border: 1px solid #ccc;
+            border-radius: 0.5em;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 2em;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr auto;
+            gap: 0.5em;
+            width: 200px;
+            height: 160px;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition:
+                opacity 0.3s ease,
+                transform 0.3s ease;
+        }
+
+        #seatingGrid.show {
+            display: grid;
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) translateY(0);
+        }
+
+        .seating-btn {
+            font-size: 0.8em;
+            font-weight: bold;
+            border: 2px solid #ccc;
+            border-radius: 0.5em;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            padding: 0.8em;
+            position: relative;
+        }
+
+        .seating-btn:hover {
+            background: #f0f0f0;
+            transform: scale(1.02);
+        }
+
+        .seating-btn.active {
+            background: #2980b9;
+            color: white;
+            border-color: #1a5276;
+        }
+
+        .table-visual {
+            position: relative;
+            width: 2.5em;
+            height: 2.5em;
+        }
+
+        .table-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1.1em;
+            height: 1.1em;
+            background: #666;
+            border-radius: 2px;
+        }
+
+        .player-pos {
+            position: absolute;
+            font-size: 1.2em;
+            font-weight: normal;
+            color: inherit;
+        }
+
+        .player-pos.bottom {
+            bottom: -0.6em;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .player-pos.left {
+            left: -0.4em;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .player-pos.top {
+            top: -0.6em;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .player-pos.right {
+            right: -0.4em;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .player-pos.bold {
+            font-weight: bold;
+        }
+
+        .btn-label {
+            position: absolute;
+            top: 0.2em;
+            left: 0.2em;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #666;
+            background: white;
+            border-radius: 2px;
+            padding: 0.1em 0.3em;
+            line-height: 1;
+        }
+
+        /* Dark theme for seating buttons */
+        body.dark .seating-btn {
+            background: #444;
+            color: #ddd;
+            border-color: #666;
+        }
+
+        body.dark .seating-btn:hover {
+            background: #555;
+        }
+
+        body.dark .seating-btn.active {
+            background: #1a5276;
+            color: white;
+            border-color: #144a75;
+        }
+
+        body.dark .table-center {
+            background: #aaa;
+        }
+
+        body.dark .btn-label {
+            color: #ddd;
+            background: #333;
+        }
+
+        /* Dark theme for seating grid panel */
+        body.dark #seatingGrid {
+            background: #333;
+            border-color: #555;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+        }
+
+        #seatingGrid .seating-ok-row {
+            grid-column: 1 / span 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin-top: 1em;
+        }
+
+        #seatingOkBtn {
+            margin: 0;
+            color: #27ae60;
+        }
+    </style>
 </head>
+
 <body>
-<div id="timer-container">
-    <div id="timer">40</div>
-    <div id="player-indicator"></div>
-</div>
-<div id="instructions" style="display:none;">
-    ▶ krótkie naciśnięcie - start<br>
-    ⏸ długie naciśnięcie - pauza
-</div>
-<div class="top-btns">
-    <button id="optionsBtn">Opcje</button>
-    <button id="seatingToggleBtn">Miejsca</button>
-    <button id="fullscreenBtn">⛶</button>
-</div>
-<div id="seatingGrid">
-    <button class="seating-btn" data-arrangement="ABCD">
-        <div class="btn-label">1</div>
-        <div class="table-visual">
-            <div class="table-center"></div>
-            <div class="player-pos bottom bold">A</div>
-            <div class="player-pos left">B</div>
-            <div class="player-pos top">C</div>
-            <div class="player-pos right">D</div>
-        </div>
-    </button>
-    <button class="seating-btn" data-arrangement="CBDA">
-        <div class="btn-label">2</div>
-        <div class="table-visual">
-            <div class="table-center"></div>
-            <div class="player-pos bottom">C</div>
-            <div class="player-pos left bold">B</div>
-            <div class="player-pos top">D</div>
-            <div class="player-pos right">A</div>
-        </div>
-    </button>
-    <button class="seating-btn" data-arrangement="CADB">
-        <div class="btn-label">3</div>
-        <div class="table-visual">
-            <div class="table-center"></div>
-            <div class="player-pos bottom bold">C</div>
-            <div class="player-pos left">A</div>
-            <div class="player-pos top">D</div>
-            <div class="player-pos right">B</div>
-        </div>
-    </button>
-    <button class="seating-btn" data-arrangement="BADC">
-        <div class="btn-label">4</div>
-        <div class="table-visual">
-            <div class="table-center"></div>
-            <div class="player-pos bottom">B</div>
-            <div class="player-pos left">A</div>
-            <div class="player-pos top bold">D</div>
-            <div class="player-pos right">C</div>
-        </div>
-    </button>
-    <div class="seating-ok-row">
-        <button id="seatingOkBtn" class="icon-btn" title="OK" aria-label="Confirm">&#10003;</button>
+    <div id="timer-container">
+        <div id="timer">40</div>
+        <div id="player-indicator"></div>
     </div>
-</div>
-<div id="optionsPanel">
-    <div class="options-section">
-        <div class="section-title">Gracze</div>
-        <div class="player-checkbox">
-            <input type="checkbox" id="player1"><label for="player1">Gracz A <span class="arrow-label">(↓)</span></label>
-        </div>
-        <div class="player-checkbox">
-            <input type="checkbox" id="player2"><label for="player2">Gracz B <span class="arrow-label">(←)</span></label>
-        </div>
-        <div class="player-checkbox">
-            <input type="checkbox" id="player3"><label for="player3">Gracz C <span class="arrow-label">(↑)</span></label>
-        </div>
-        <div class="player-checkbox">
-            <input type="checkbox" id="player4"><label for="player4">Gracz D <span class="arrow-label">(→)</span></label>
+    <div id="instructions" style="display:none;">
+        ▶ krótkie naciśnięcie - start<br>
+        ⏸ długie naciśnięcie - pauza
+    </div>
+    <div class="top-btns">
+        <button id="optionsBtn">Opcje</button>
+        <button id="seatingToggleBtn">Miejsca</button>
+        <button id="fullscreenBtn">⛶</button>
+    </div>
+    <div id="seatingGrid">
+        <button class="seating-btn" data-arrangement="ABCD">
+            <div class="btn-label">1</div>
+            <div class="table-visual">
+                <div class="table-center"></div>
+                <div class="player-pos bottom bold">A</div>
+                <div class="player-pos left">B</div>
+                <div class="player-pos top">C</div>
+                <div class="player-pos right">D</div>
+            </div>
+        </button>
+        <button class="seating-btn" data-arrangement="CBDA">
+            <div class="btn-label">2</div>
+            <div class="table-visual">
+                <div class="table-center"></div>
+                <div class="player-pos bottom">C</div>
+                <div class="player-pos left bold">B</div>
+                <div class="player-pos top">D</div>
+                <div class="player-pos right">A</div>
+            </div>
+        </button>
+        <button class="seating-btn" data-arrangement="CADB">
+            <div class="btn-label">3</div>
+            <div class="table-visual">
+                <div class="table-center"></div>
+                <div class="player-pos bottom bold">C</div>
+                <div class="player-pos left">A</div>
+                <div class="player-pos top">D</div>
+                <div class="player-pos right">B</div>
+            </div>
+        </button>
+        <button class="seating-btn" data-arrangement="BADC">
+            <div class="btn-label">4</div>
+            <div class="table-visual">
+                <div class="table-center"></div>
+                <div class="player-pos bottom">B</div>
+                <div class="player-pos left">A</div>
+                <div class="player-pos top bold">D</div>
+                <div class="player-pos right">C</div>
+            </div>
+        </button>
+        <div class="seating-ok-row">
+            <button id="seatingOkBtn" class="icon-btn" title="OK" aria-label="Confirm">&#10003;</button>
         </div>
     </div>
+    <div id="optionsPanel">
+        <div class="options-section">
+            <div class="section-title">Gracze</div>
+            <div class="player-checkbox">
+                <input type="checkbox" id="player1"><label for="player1">Gracz A <span
+                        class="arrow-label">(↓)</span></label>
+            </div>
+            <div class="player-checkbox">
+                <input type="checkbox" id="player2"><label for="player2">Gracz B <span
+                        class="arrow-label">(←)</span></label>
+            </div>
+            <div class="player-checkbox">
+                <input type="checkbox" id="player3"><label for="player3">Gracz C <span
+                        class="arrow-label">(↑)</span></label>
+            </div>
+            <div class="player-checkbox">
+                <input type="checkbox" id="player4"><label for="player4">Gracz D <span
+                        class="arrow-label">(→)</span></label>
+            </div>
+            <div class="player-checkbox">
+                <input type="checkbox" id="player5"><label for="player5">Gracz E</label>
+            </div>
+            <div class="player-checkbox">
+                <input type="checkbox" id="player6"><label for="player6">Gracz F</label>
+            </div>
+        </div>
 
-    <div class="options-section">
-        <div class="section-title">Czas</div>
-        <div id="intervalControl">
-            <label>Czas:</label>
-            <button type="button" id="decreaseInterval" aria-label="Decrease time">−</button>
-            <span id="intervalDisplay">40</span>
-            <button type="button" id="increaseInterval" aria-label="Increase time">+</button>
+        <div class="options-section">
+            <div class="section-title">Czas</div>
+            <div id="intervalControl">
+                <label>Czas:</label>
+                <button type="button" id="decreaseInterval" aria-label="Decrease time">−</button>
+                <span id="intervalDisplay">40</span>
+                <button type="button" id="increaseInterval" aria-label="Increase time">+</button>
+            </div>
+        </div>
+
+        <div class="options-section">
+            <div class="section-title">Ustawienia</div>
+            <div style="margin-bottom: 0.8em;">
+                <label>
+                    <input type="checkbox" id="darkThemeToggle" />
+                    Ciemny motyw
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="checkbox" id="rotate45Toggle" />
+                    Obróć o 45°
+                </label>
+            </div>
+        </div>
+
+        <div class="options-actions">
+            <button id="okBtn" class="icon-btn" title="OK" aria-label="Confirm">&#10003;</button>
         </div>
     </div>
+    <audio id="tickSound" src="sounds/tick.mp3" preload="auto"></audio>
+    <audio id="gongSound" src="sounds/gong.mp3" preload="auto"></audio>
 
-    <div class="options-section">
-        <div class="section-title">Ustawienia</div>
-        <div style="margin-bottom: 0.8em;">
-            <label>
-                <input type="checkbox" id="darkThemeToggle" />
-                Ciemny motyw
-            </label>
-        </div>
-        <div>
-            <label>
-                <input type="checkbox" id="rotate45Toggle" />
-                Obróć o 45° 
-            </label>
-        </div>
-    </div>
+    <script>
+        (() => {
 
-    <div class="options-actions">
-        <button id="okBtn" class="icon-btn" title="OK" aria-label="Confirm">&#10003;</button>
-    </div>
-</div>
-<audio id="tickSound" src="sounds/tick.mp3" preload="auto"></audio>
-<audio id="gongSound" src="sounds/gong.mp3" preload="auto"></audio>
+            // ===== Constants =====
+            const LONG_PRESS_MS = 500;
+            const MIN_INTERVAL = 5;
+            const MAX_INTERVAL = 300;
+            const STORAGE_KEY_THEME = 'countdown_timer_theme';
+            const STORAGE_KEY_ROTATE45 = 'countdown_timer_rotate45';
+            const STORAGE_KEY_SEATING = 'countdown_timer_seating';
 
-<script>
-(() => {
+            // Predefined seating arrangements
+            // Maps player positions (↓←↑→) to player letters (A,B,C,D)
+            const SEATING_ARRANGEMENTS = {
+                'ABCD': ['A', 'B', 'C', 'D'], // A=↓, B=←, C=↑, D=→
+                'CBDA': ['C', 'B', 'D', 'A'], // C=↓, B=←, D=↑, A=→  
+                'CADB': ['C', 'A', 'D', 'B'], // C=↓, A=←, D=↑, B=→
+                'BADC': ['B', 'A', 'D', 'C']  // B=↓, A=←, D=↑, C=→
+            };
 
-    // ===== Constants =====
-    const LONG_PRESS_MS = 500;
-    const MIN_INTERVAL = 5;
-    const MAX_INTERVAL = 300;
-    const STORAGE_KEY_THEME = 'countdown_timer_theme';
-    const STORAGE_KEY_ROTATE45 = 'countdown_timer_rotate45';
-    const STORAGE_KEY_SEATING = 'countdown_timer_seating';
+            // Player colors for light and dark themes - indexed by letter A=0, B=1, C=2, D=3, E=4, F=5
+            const PLAYER_COLORS_LIGHT = ['#333', '#e74c3c', '#2980b9', '#27ae60', '#8e44ad', '#f39c12']; // A=black, B=red, C=blue, D=green, E=purple, F=orange
+            const PLAYER_COLORS_DARK = ['#bbb', '#ff6b6b', '#5dade2', '#58d68d', '#bb8fce', '#f8c471'];   // A=light gray, B=light red, C=light blue, D=light green, E=light purple, F=light orange
 
-    // Predefined seating arrangements
-    // Maps player positions (↓←↑→) to player letters (A,B,C,D)
-    const SEATING_ARRANGEMENTS = {
-        'ABCD': ['A', 'B', 'C', 'D'], // A=↓, B=←, C=↑, D=→
-        'CBDA': ['C', 'B', 'D', 'A'], // C=↓, B=←, D=↑, A=→  
-        'CADB': ['C', 'A', 'D', 'B'], // C=↓, A=←, D=↑, B=→
-        'BADC': ['B', 'A', 'D', 'C']  // B=↓, A=←, D=↑, C=→
-    };
+            // ===== State =====
+            const state = {
+                startTime: 40,
+                countdown: 40,
+                rotation: 270, // default rotation start (can be 315 if rotate45Toggle is enabled)
+                isPaused: false,
+                currentPlayer: 3,
+                players: [true, true, true, true, false, false],
+                seatingArrangement: 'ABCD', // Current seating arrangement
+                intervalId: null,
+                lastPressTime: 0,
+                longPressTimeout: null,
+                darkTheme: false,
+                rotate45Start: false // toggle for rotate 45° start
+            };
 
-    // Player colors for light and dark themes - indexed by letter A=0, B=1, C=2, D=3
-    const PLAYER_COLORS_LIGHT = ['#333', '#e74c3c', '#2980b9', '#27ae60']; // A=black, B=red, C=blue, D=green
-    const PLAYER_COLORS_DARK = ['#bbb', '#ff6b6b', '#5dade2', '#58d68d'];   // A=light gray, B=light red, C=light blue, D=light green
+            // ===== Elements =====
+            const timerContainerEl = document.getElementById('timer-container');
+            const timerEl = document.getElementById('timer');
+            const playerIndicatorEl = document.getElementById('player-indicator');
+            const optionsBtn = document.getElementById('optionsBtn');
+            const seatingToggleBtn = document.getElementById('seatingToggleBtn');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            const seatingGrid = document.getElementById('seatingGrid');
+            const seatingBtns = document.querySelectorAll('.seating-btn');
+            const optionsPanel = document.getElementById('optionsPanel');
+            const playerCheckboxes = [
+                document.getElementById('player1'),
+                document.getElementById('player2'),
+                document.getElementById('player3'),
+                document.getElementById('player4'),
+                document.getElementById('player5'),
+                document.getElementById('player6')
+            ];
+            const tickSound = document.getElementById('tickSound');
+            const gongSound = document.getElementById('gongSound');
+            const okBtn = document.getElementById('okBtn');
+            const darkThemeToggle = document.getElementById('darkThemeToggle');
+            const rotate45Toggle = document.getElementById('rotate45Toggle');
 
-    // ===== State =====
-    const state = {
-        startTime: 40,
-        countdown: 40,
-        rotation: 270, // default rotation start (can be 315 if rotate45Toggle is enabled)
-        isPaused: false,
-        currentPlayer: 3,
-        players: [true, true, true, true],
-        seatingArrangement: 'ABCD', // Current seating arrangement
-        intervalId: null,
-        lastPressTime: 0,
-        longPressTimeout: null,
-        darkTheme: false,
-        rotate45Start: false // toggle for rotate 45° start
-    };
+            // New interval controls
+            const decreaseBtn = document.getElementById('decreaseInterval');
+            const increaseBtn = document.getElementById('increaseInterval');
+            const intervalDisplay = document.getElementById('intervalDisplay');
+            const seatingOkBtn = document.getElementById('seatingOkBtn');
 
-    // ===== Elements =====
-    const timerContainerEl = document.getElementById('timer-container');
-    const timerEl = document.getElementById('timer');
-    const playerIndicatorEl = document.getElementById('player-indicator');
-    const optionsBtn = document.getElementById('optionsBtn');
-    const seatingToggleBtn = document.getElementById('seatingToggleBtn');
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
-    const seatingGrid = document.getElementById('seatingGrid');
-    const seatingBtns = document.querySelectorAll('.seating-btn');
-    const optionsPanel = document.getElementById('optionsPanel');
-    const playerCheckboxes = [
-        document.getElementById('player1'),
-        document.getElementById('player2'),
-        document.getElementById('player3'),
-        document.getElementById('player4')
-    ];
-    const tickSound = document.getElementById('tickSound');
-    const gongSound = document.getElementById('gongSound');
-    const okBtn = document.getElementById('okBtn');
-    const darkThemeToggle = document.getElementById('darkThemeToggle');
-    const rotate45Toggle = document.getElementById('rotate45Toggle');
+            // ===== Helpers =====
+            const playSound = (audio) => { audio.currentTime = 0; audio.play(); };
+            const isValidInterval = (v) => Number.isInteger(v) && v >= MIN_INTERVAL && v <= MAX_INTERVAL;
+            const isOptionsPanelOpen = () => optionsPanel.classList.contains('show');
+            const isSeatingGridOpen = () => seatingGrid.classList.contains('show');
+            const isAnyPanelOpen = () => isOptionsPanelOpen() || isSeatingGridOpen();
+            // Save interval to localStorage
+            const saveIntervalToStorage = () => {
+                localStorage.setItem('countdown_timer_interval', state.startTime.toString());
+            };
 
-    // New interval controls
-    const decreaseBtn = document.getElementById('decreaseInterval');
-    const increaseBtn = document.getElementById('increaseInterval');
-    const intervalDisplay = document.getElementById('intervalDisplay');
-    const seatingOkBtn = document.getElementById('seatingOkBtn');
-
-    // ===== Helpers =====
-    const playSound = (audio) => { audio.currentTime = 0; audio.play(); };
-    const isValidInterval = (v) => Number.isInteger(v) && v >= MIN_INTERVAL && v <= MAX_INTERVAL;
-    const isOptionsPanelOpen = () => optionsPanel.classList.contains('show');
-    const isSeatingGridOpen = () => seatingGrid.classList.contains('show');
-    const isAnyPanelOpen = () => isOptionsPanelOpen() || isSeatingGridOpen();
-    // Save interval to localStorage
-    const saveIntervalToStorage = () => {
-        localStorage.setItem('countdown_timer_interval', state.startTime.toString());
-    };
-
-    // Load interval from localStorage
-    const loadIntervalFromStorage = () => {
-        const saved = localStorage.getItem('countdown_timer_interval');
-        if (saved && isValidInterval(parseInt(saved))) {
-            return parseInt(saved);
-        }
-        return 40; // default
-    };
-
-    const savePlayerSelection = () => {
-        state.players = playerCheckboxes.map(cb => cb.checked);
-        localStorage.setItem('countdown_timer_players', JSON.stringify(state.players));
-    };
-    const loadPlayerSelection = () => {
-        const saved = localStorage.getItem('countdown_timer_players');
-        if (saved) {
-            try {
-                state.players = JSON.parse(saved);
-            } catch (e) {
-                state.players = [true, true, true, true];
-            }
-        }
-        playerCheckboxes.forEach((cb, i) => cb.checked = state.players[i]);
-    };
-
-    // Fullscreen functionality
-    const isFullscreenSupported = () => {
-        return !!(document.fullscreenEnabled || 
-                 document.webkitFullscreenEnabled || 
-                 document.mozFullScreenEnabled ||
-                 document.msFullscreenEnabled);
-    };
-
-    const isFullscreen = () => {
-        return !!(document.fullscreenElement || 
-                 document.webkitFullscreenElement || 
-                 document.mozFullScreenElement ||
-                 document.msFullscreenElement);
-    };
-
-    const enterFullscreen = () => {
-        const elem = document.documentElement;
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.webkitRequestFullscreen) {
-            elem.webkitRequestFullscreen();
-        } else if (elem.mozRequestFullScreen) {
-            elem.mozRequestFullScreen();
-        } else if (elem.msRequestFullscreen) {
-            elem.msRequestFullscreen();
-        }
-    };
-
-    const exitFullscreen = () => {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-        }
-    };
-
-    const toggleFullscreen = () => {
-        if (!isFullscreenSupported()) {
-            alert('Fullscreen nie jest obsługiwany w tej przeglądarce');
-            return;
-        }
-        
-        if (isFullscreen()) {
-            exitFullscreen();
-        } else {
-            enterFullscreen();
-        }
-    };
-
-    const updateFullscreenButton = () => {
-        if (isFullscreenSupported()) {
-            fullscreenBtn.textContent = isFullscreen() ? '⯐' : '⛶';
-            fullscreenBtn.title = isFullscreen() ? 'Wyjdź z pełnego ekranu' : 'Pełny ekran';
-        } else {
-            fullscreenBtn.style.display = 'none';
-        }
-    };
-
-    // Player labels
-    const PLAYER_LABELS = ['A', 'B', 'C', 'D'];
-    const playerLabels = [
-      { normal: 'Gracz A <span class="arrow-label">(↓)</span>', diagonal: 'Gracz A <span class="arrow-label">(↙)</span>' },
-      { normal: 'Gracz B <span class="arrow-label">(←)</span>', diagonal: 'Gracz B <span class="arrow-label">(↖)</span>' },
-      { normal: 'Gracz C <span class="arrow-label">(↑)</span>', diagonal: 'Gracz C <span class="arrow-label">(↗)</span>' },
-      { normal: 'Gracz D <span class="arrow-label">(→)</span>', diagonal: 'Gracz D <span class="arrow-label">(↘)</span>' }
-    ];
-
-    // Update the player indicator below the timer
-    const updatePlayerIndicator = () => {   
-        // Only show for enabled players
-        if (!state.players.some(Boolean)) {
-            playerIndicatorEl.textContent = '';
-            return;
-        }
-        // Get the player letter based on current seating arrangement
-        const currentSeating = SEATING_ARRANGEMENTS[state.seatingArrangement];
-        const label = currentSeating[state.currentPlayer];
-        const color = getPlayerColor();
-        playerIndicatorEl.innerHTML = label;
-        playerIndicatorEl.style.color = color;
-        // Ensure timer and indicator always have the same color
-        timerEl.style.color = color;
-    };
-
-    // Update seating arrangement buttons display
-    const updateSeatingButtons = () => {
-        seatingBtns.forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.arrangement === state.seatingArrangement);
-        });
-    };
-
-    // Set seating arrangement
-    const setSeatingArrangement = (arrangement) => {
-        if (SEATING_ARRANGEMENTS[arrangement]) {
-            state.seatingArrangement = arrangement;
-            localStorage.setItem(STORAGE_KEY_SEATING, arrangement);
-            
-            updateSeatingButtons();
-            //reset rotation and current player
-            state.rotation = getInitialRotation() + 90;
-            state.currentPlayer = 0;
-
-            timerContainerEl.style.transform = `translate(-50%, -50%) rotate(${state.rotation}deg)`;
-            updatePlayerIndicator();
-            if (arrangement === 'ABCD') {
-
-            } else
-            if (arrangement === 'CBDA') {
-                nextActivePlayer();
-            } else
-            if (arrangement === 'CADB') {
-                
-            } else
-            if (arrangement === 'BADC') {
-                nextActivePlayer();
-                nextActivePlayer();
-            }
-
-
-        }
-    };
-
-    // Load saved seating arrangement
-    const loadSeatingArrangement = () => {
-        const saved = localStorage.getItem(STORAGE_KEY_SEATING);
-        if (saved && SEATING_ARRANGEMENTS[saved]) {
-            state.seatingArrangement = saved;
-        } else {
-            state.seatingArrangement = 'ABCD';
-        }
-        updateSeatingButtons();
-    };
-
-    
-    const setStartTime = (val) => {
-        state.startTime = val;
-        state.countdown = val;
-        timerEl.textContent = val;
-        updatePlayerIndicator();
-    };
-
-    // Update displayed interval and state when plus/minus pressed or reset
-    const updateIntervalDisplay = (val) => {
-        val = Math.min(Math.max(val, MIN_INTERVAL), MAX_INTERVAL);
-        state.startTime = val;
-        state.countdown = val;
-        intervalDisplay.textContent = val;
-        timerEl.textContent = val;
-        updatePlayerIndicator();
-    };
-
-    
-    // Return correct player color based on current theme and player letter
-    const getPlayerColor = () => {
-        // Get the current player letter based on seating arrangement
-        const currentSeating = SEATING_ARRANGEMENTS[state.seatingArrangement];
-        const playerLetter = currentSeating[state.currentPlayer];
-        // Convert letter to index: A=0, B=1, C=2, D=3
-        const colorIndex = playerLetter.charCodeAt(0) - 'A'.charCodeAt(0);
-        return state.darkTheme 
-            ? PLAYER_COLORS_DARK[colorIndex] 
-            : PLAYER_COLORS_LIGHT[colorIndex];
-    };
-
-    const applyTheme = (dark) => {
-        state.darkTheme = dark;
-        if (dark) {
-            document.body.classList.add('dark');
-            darkThemeToggle.checked = true;
-        } else {
-            document.body.classList.remove('dark');
-            darkThemeToggle.checked = false;
-        }
-        localStorage.setItem(STORAGE_KEY_THEME, dark ? 'dark' : 'light');
-
-        // Update timer and indicator colors on theme change
-        updatePlayerIndicator();
-    };
-
-    // ===== Rotation helpers =====
-    const getInitialRotation = () => state.rotate45Start ? 315 : 270;
-
-    const nextActivePlayer = () => {
-        do {
-            state.currentPlayer = (state.currentPlayer + 1) % 4;
-            state.rotation += 90;
-        } while (!state.players[state.currentPlayer]);
-        timerContainerEl.style.transform = `translate(-50%, -50%) rotate(${state.rotation}deg)`;
-        updatePlayerIndicator();
-    };
-
-    // ===== Timer Logic =====
-    const startCountdown = () => {
-        if (!state.players.some(Boolean)) {
-            alert("Brak graczy, włącz przynajmniej jednego");
-            return;
-        }
-        clearInterval(state.intervalId);
-        setStartTime(state.startTime);
-
-        nextActivePlayer();
-        state.isPaused = false;
-        timerEl.style.opacity = 1;
-        optionsBtn.style.display = "none";
-        optionsPanel.classList.remove("show");
-
-        state.intervalId = setInterval(() => {
-            if (!state.isPaused) {
-                state.countdown--;
-                timerEl.textContent = state.countdown;
-                if (state.countdown <= 5 && state.countdown > 0) playSound(tickSound);
-                if (state.countdown <= 0) {
-                    clearInterval(state.intervalId);
-                    timerEl.textContent = 0;
-                    playSound(gongSound);
+            // Load interval from localStorage
+            const loadIntervalFromStorage = () => {
+                const saved = localStorage.getItem('countdown_timer_interval');
+                if (saved && isValidInterval(parseInt(saved))) {
+                    return parseInt(saved);
                 }
-            }
-        }, 1000);
-    };
+                return 40; // default
+            };
 
-    const instructionsEl = document.getElementById('instructions');
-
-    const togglePause = () => {
-        state.isPaused = !state.isPaused;
-        timerEl.style.opacity = state.isPaused ? 0.5 : 1;
-        optionsBtn.style.display = state.isPaused ? "block" : "none";
-        seatingToggleBtn.style.display = state.isPaused ? "block" : "none";
-        fullscreenBtn.style.display = state.isPaused && isFullscreenSupported() ? "block" : "none";
-        instructionsEl.style.display = state.isPaused ? "block" : "none";
-        if (!state.isPaused) {
-            optionsPanel.classList.remove("show");
-            seatingGrid.classList.remove("show");
-        } else {
-            setStartTime(state.startTime);
-            savePlayerSelection();
-            updateSeatingButtons();
-            updateFullscreenButton();
-            }
-        };
-
-    // ===== Event Handlers =====
-    const handlePressStart = (e) => {
-        if (e.target === optionsBtn || e.target === seatingToggleBtn || e.target === fullscreenBtn || optionsPanel.contains(e.target) || seatingGrid.contains(e.target)) return;
-        e.preventDefault();
-        state.lastPressTime = Date.now();
-        state.longPressTimeout = setTimeout(() => {
-            togglePause();
-            state.longPressTimeout = null;
-        }, LONG_PRESS_MS);
-    };
-
-    const handlePressEnd = (e) => {
-        if (e.target === optionsBtn || e.target === seatingToggleBtn || e.target === fullscreenBtn || optionsPanel.contains(e.target) || seatingGrid.contains(e.target)) return;
-        e.preventDefault();
-        if (state.longPressTimeout) {
-            clearTimeout(state.longPressTimeout);
-            state.longPressTimeout = null;
-            if (isAnyPanelOpen()) return;
-            if (Date.now() - state.lastPressTime < LONG_PRESS_MS) {
-                if (state.isPaused) togglePause();
-                else startCountdown();
-            }
-        }
-    };
-
-    // Options panel toggle with animation
-    const showOptionsPanel = () => {
-        seatingGrid.classList.remove('show'); // Hide seating grid
-        optionsPanel.classList.add('show');
-    };
-
-    // Show seating grid and hide options panel
-    const showSeatingGrid = () => {
-        optionsPanel.classList.remove('show'); // Hide options panel
-        seatingGrid.classList.add('show');
-    };
-
-    // Toggle seating grid visibility
-    const toggleSeatingGrid = () => {
-        if (seatingGrid.classList.contains('show')) {
-            seatingGrid.classList.remove('show');
-        } else {
-            showSeatingGrid();
-        }
-    };
-
-    // Load rotate45Toggle from state/localStorage
-    const loadRotate45Toggle = () => {
-        const saved = localStorage.getItem(STORAGE_KEY_ROTATE45);
-        state.rotate45Start = saved === 'true';
-        rotate45Toggle.checked = state.rotate45Start;
-    };
-
-    // Save rotate45Toggle to localStorage
-    const saveRotate45Toggle = (val) => {
-        localStorage.setItem(STORAGE_KEY_ROTATE45, val ? 'true' : 'false');
-    };
-
-    // ===== Bind Events =====
-
-    document.body.addEventListener('pointerdown', handlePressStart);
-    document.body.addEventListener('pointerup', handlePressEnd);
-    document.body.addEventListener('pointerleave', handlePressEnd);
-
-    optionsBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showOptionsPanel();
-    });
-
-    seatingToggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleSeatingGrid();
-    });
-
-    fullscreenBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleFullscreen();
-    });
-
-    decreaseBtn.addEventListener('click', () => {
-        updateIntervalDisplay(state.startTime - 1);
-        saveIntervalToStorage();
-    });
-
-    increaseBtn.addEventListener('click', () => {
-        updateIntervalDisplay(state.startTime + 1);
-        saveIntervalToStorage();
-    });
-
-    // Player checkbox change handlers - apply immediately
-    playerCheckboxes.forEach((checkbox, index) => {
-        checkbox.addEventListener('change', () => {
-            state.players[index] = checkbox.checked;
-            savePlayerSelection();
-            updatePlayerIndicator();
-        });
-    });
-
-    // Seating arrangement button event handlers
-    seatingBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const arrangement = btn.dataset.arrangement;
-            setSeatingArrangement(arrangement);
-        });
-    });
-
-    okBtn.addEventListener('click', () => {
-        // All settings are now applied immediately, OK just closes the panel
-        optionsPanel.classList.remove('show');
-        seatingGrid.classList.remove('show');
-        if (!state.isPaused) startCountdown();
-    });
-
-    darkThemeToggle.addEventListener('change', () => {
-        applyTheme(darkThemeToggle.checked);
-    });
-
-    rotate45Toggle.addEventListener('change', () => {
-        state.rotate45Start = rotate45Toggle.checked;
-        saveRotate45Toggle(state.rotate45Start);
-        state.rotation = getInitialRotation();
-        state.currentPlayer = 3;
-        nextActivePlayer();
-        updatePlayerLabelsDiagonal();
-        // Restart countdown to apply rotation change immediately if not paused
-        if (!state.isPaused) startCountdown();
-    });
-
-    // Close any open panel if clicking outside
-    document.body.addEventListener('click', (e) => {
-        const clickedOnButton = e.target === optionsBtn || e.target === seatingToggleBtn || e.target === fullscreenBtn;
-        const clickedInPanel = optionsPanel.contains(e.target) || seatingGrid.contains(e.target);
-        
-        if (!clickedOnButton && !clickedInPanel) {
-            optionsPanel.classList.remove('show');
-            seatingGrid.classList.remove('show');
-        }
-    });
-
-    optionsPanel.addEventListener('click', e => e.stopPropagation());
-    seatingGrid.addEventListener('click', e => e.stopPropagation());
-
-    // Fullscreen change event listeners for different browsers
-    document.addEventListener('fullscreenchange', updateFullscreenButton);
-    document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
-    document.addEventListener('mozfullscreenchange', updateFullscreenButton);
-    document.addEventListener('MSFullscreenChange', updateFullscreenButton);
-
-    // Prevent context menu on timer (to avoid mobile search popup)
-    timerEl.addEventListener('contextmenu', e => {
-        e.preventDefault();
-    });
-
-    // Lock screen orientation to prevent autorotation
-    const lockOrientation = async () => {
-        try {
-            if (screen.orientation && screen.orientation.lock) {
-                // Lock to current orientation (portrait or landscape)
-                const currentOrientation = screen.orientation.type;
-                if (currentOrientation.includes('portrait')) {
-                    await screen.orientation.lock('portrait');
-                } else if (currentOrientation.includes('landscape')) {
-                    await screen.orientation.lock('landscape');
+            const savePlayerSelection = () => {
+                state.players = playerCheckboxes.map(cb => cb.checked);
+                localStorage.setItem('countdown_timer_players', JSON.stringify(state.players));
+            };
+            const loadPlayerSelection = () => {
+                const saved = localStorage.getItem('countdown_timer_players');
+                if (saved) {
+                    try {
+                        const savedPlayers = JSON.parse(saved);
+                        // Ensure we have 6 players, fill missing with false
+                        state.players = [...savedPlayers];
+                        while (state.players.length < 6) {
+                            state.players.push(false);
+                        }
+                        state.players = state.players.slice(0, 6); // Ensure max 6 players
+                    } catch (e) {
+                        state.players = [true, true, true, true, false, false];
+                    }
                 }
+                playerCheckboxes.forEach((cb, i) => cb.checked = state.players[i]);
+            };
+
+            // Fullscreen functionality
+            const isFullscreenSupported = () => {
+                return !!(document.fullscreenEnabled ||
+                    document.webkitFullscreenEnabled ||
+                    document.mozFullScreenEnabled ||
+                    document.msFullscreenEnabled);
+            };
+
+            const isFullscreen = () => {
+                return !!(document.fullscreenElement ||
+                    document.webkitFullscreenElement ||
+                    document.mozFullScreenElement ||
+                    document.msFullscreenElement);
+            };
+
+            const enterFullscreen = () => {
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.mozRequestFullScreen) {
+                    elem.mozRequestFullScreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
+            };
+
+            const exitFullscreen = () => {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            };
+
+            const toggleFullscreen = () => {
+                if (!isFullscreenSupported()) {
+                    alert('Fullscreen nie jest obsługiwany w tej przeglądarce');
+                    return;
+                }
+
+                if (isFullscreen()) {
+                    exitFullscreen();
+                } else {
+                    enterFullscreen();
+                }
+            };
+
+            const updateFullscreenButton = () => {
+                if (isFullscreenSupported()) {
+                    fullscreenBtn.textContent = isFullscreen() ? '⯐' : '⛶';
+                    fullscreenBtn.title = isFullscreen() ? 'Wyjdź z pełnego ekranu' : 'Pełny ekran';
+                } else {
+                    fullscreenBtn.style.display = 'none';
+                }
+            };
+
+            // Player labels
+            const PLAYER_LABELS = ['A', 'B', 'C', 'D', 'E', 'F'];
+            const playerLabels = [
+                { normal: 'Gracz A <span class="arrow-label">(↓)</span>', diagonal: 'Gracz A <span class="arrow-label">(↙)</span>' },
+                { normal: 'Gracz B <span class="arrow-label">(←)</span>', diagonal: 'Gracz B <span class="arrow-label">(↖)</span>' },
+                { normal: 'Gracz C <span class="arrow-label">(↑)</span>', diagonal: 'Gracz C <span class="arrow-label">(↗)</span>' },
+                { normal: 'Gracz D <span class="arrow-label">(→)</span>', diagonal: 'Gracz D <span class="arrow-label">(↘)</span>' },
+                { normal: 'Gracz E', diagonal: 'Gracz E' },
+                { normal: 'Gracz F', diagonal: 'Gracz F' }
+            ];
+
+            // Update the player indicator below the timer
+            const updatePlayerIndicator = () => {
+                // Only show for enabled players
+                if (!state.players.some(Boolean)) {
+                    playerIndicatorEl.textContent = '';
+                    return;
+                }
+                // Get the player letter based on current seating arrangement (for A-D) or direct label (for E-F)
+                let label;
+                if (state.currentPlayer < 4) {
+                    const currentSeating = SEATING_ARRANGEMENTS[state.seatingArrangement];
+                    label = currentSeating[state.currentPlayer];
+                } else {
+                    // For players E and F, use direct labels
+                    label = PLAYER_LABELS[state.currentPlayer];
+                }
+                const color = getPlayerColor();
+                playerIndicatorEl.innerHTML = label;
+                playerIndicatorEl.style.color = color;
+                // Ensure timer and indicator always have the same color
+                timerEl.style.color = color;
+            };
+
+            // Update seating arrangement buttons display
+            const updateSeatingButtons = () => {
+                seatingBtns.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.arrangement === state.seatingArrangement);
+                });
+            };
+
+            // Set seating arrangement
+            const setSeatingArrangement = (arrangement) => {
+                if (SEATING_ARRANGEMENTS[arrangement]) {
+                    state.seatingArrangement = arrangement;
+                    localStorage.setItem(STORAGE_KEY_SEATING, arrangement);
+
+                    updateSeatingButtons();
+                    //reset rotation and current player
+                    state.rotation = getInitialRotation() + 90;
+                    state.currentPlayer = 0;
+
+                    timerContainerEl.style.transform = `translate(-50%, -50%) rotate(${state.rotation}deg)`;
+                    updatePlayerIndicator();
+                    if (arrangement === 'ABCD') {
+
+                    } else
+                        if (arrangement === 'CBDA') {
+                            nextActivePlayer();
+                        } else
+                            if (arrangement === 'CADB') {
+
+                            } else
+                                if (arrangement === 'BADC') {
+                                    nextActivePlayer();
+                                    nextActivePlayer();
+                                }
+
+
+                }
+            };
+
+            // Load saved seating arrangement
+            const loadSeatingArrangement = () => {
+                const saved = localStorage.getItem(STORAGE_KEY_SEATING);
+                if (saved && SEATING_ARRANGEMENTS[saved]) {
+                    state.seatingArrangement = saved;
+                } else {
+                    state.seatingArrangement = 'ABCD';
+                }
+                updateSeatingButtons();
+            };
+
+
+            const setStartTime = (val) => {
+                state.startTime = val;
+                state.countdown = val;
+                timerEl.textContent = val;
+                updatePlayerIndicator();
+            };
+
+            // Update displayed interval and state when plus/minus pressed or reset
+            const updateIntervalDisplay = (val) => {
+                val = Math.min(Math.max(val, MIN_INTERVAL), MAX_INTERVAL);
+                state.startTime = val;
+                state.countdown = val;
+                intervalDisplay.textContent = val;
+                timerEl.textContent = val;
+                updatePlayerIndicator();
+            };
+
+            // Return correct player color based on current theme and player letter
+            const getPlayerColor = () => {
+                let colorIndex;
+                if (state.currentPlayer < 4) {
+                    // Get the current player letter based on seating arrangement for A-D
+                    const currentSeating = SEATING_ARRANGEMENTS[state.seatingArrangement];
+                    const playerLetter = currentSeating[state.currentPlayer];
+                    // Convert letter to index: A=0, B=1, C=2, D=3
+                    colorIndex = playerLetter.charCodeAt(0) - 'A'.charCodeAt(0);
+                } else {
+                    // For players E and F, use direct index
+                    colorIndex = state.currentPlayer;
+                }
+                return state.darkTheme
+                    ? PLAYER_COLORS_DARK[colorIndex]
+                    : PLAYER_COLORS_LIGHT[colorIndex];
+            };
+
+            const applyTheme = (dark) => {
+                state.darkTheme = dark;
+                if (dark) {
+                    document.body.classList.add('dark');
+                    darkThemeToggle.checked = true;
+                } else {
+                    document.body.classList.remove('dark');
+                    darkThemeToggle.checked = false;
+                }
+                localStorage.setItem(STORAGE_KEY_THEME, dark ? 'dark' : 'light');
+
+                // Update timer and indicator colors on theme change
+                updatePlayerIndicator();
+            };
+
+            // ===== Rotation helpers =====
+            const getInitialRotation = () => {
+                if (state.players[4] || state.players[5]) {
+                    // If E or F is active, use 60° increments
+                    return 300;
+                }
+                return state.rotate45Start ? 315 : 270;
             }
-        } catch (error) {
-            // Orientation lock is not supported or requires fullscreen
-            console.log('Orientation lock not available:', error.message);
-        }
-    };
 
-    // Try to lock orientation on load
-    lockOrientation();
+            const nextActivePlayer = () => {
+                if (state.players[4] || state.players[5]) {
+                    const rotationIncrement = 60;
 
-    // Also try to lock when entering fullscreen
-    document.addEventListener('fullscreenchange', () => {
-        if (isFullscreen()) {
+                    do {
+                        state.currentPlayer = (state.currentPlayer + 1) % 6;
+                        state.rotation += rotationIncrement;
+                    } while (!state.players[state.currentPlayer]);
+                    timerContainerEl.style.transform = `translate(-50%, -50%) rotate(${state.rotation}deg)`;
+                    updatePlayerIndicator();
+
+                }
+                else {
+                    do {
+                        state.currentPlayer = (state.currentPlayer + 1) % 4;
+                        state.rotation += 90;
+                    } while (!state.players[state.currentPlayer]);
+                    timerContainerEl.style.transform = `translate(-50%, -50%) rotate(${state.rotation}deg)`;
+                    updatePlayerIndicator();
+                }
+            };
+
+            // ===== Timer Logic =====
+            const startCountdown = () => {
+                if (!state.players.some(Boolean)) {
+                    alert("Brak graczy, włącz przynajmniej jednego");
+                    return;
+                }
+                clearInterval(state.intervalId);
+                setStartTime(state.startTime);
+
+                nextActivePlayer();
+                state.isPaused = false;
+                timerEl.style.opacity = 1;
+                optionsBtn.style.display = "none";
+                optionsPanel.classList.remove("show");
+
+                state.intervalId = setInterval(() => {
+                    if (!state.isPaused) {
+                        state.countdown--;
+                        timerEl.textContent = state.countdown;
+                        if (state.countdown <= 5 && state.countdown > 0) playSound(tickSound);
+                        if (state.countdown <= 0) {
+                            clearInterval(state.intervalId);
+                            timerEl.textContent = 0;
+                            playSound(gongSound);
+                        }
+                    }
+                }, 1000);
+            };
+
+            const instructionsEl = document.getElementById('instructions');
+
+            const togglePause = () => {
+                state.isPaused = !state.isPaused;
+                timerEl.style.opacity = state.isPaused ? 0.5 : 1;
+                optionsBtn.style.display = state.isPaused ? "block" : "none";
+                seatingToggleBtn.style.display = state.isPaused ? "block" : "none";
+                fullscreenBtn.style.display = state.isPaused && isFullscreenSupported() ? "block" : "none";
+                instructionsEl.style.display = state.isPaused ? "block" : "none";
+                if (!state.isPaused) {
+                    optionsPanel.classList.remove("show");
+                    seatingGrid.classList.remove("show");
+                } else {
+                    setStartTime(state.startTime);
+                    savePlayerSelection();
+                    updateSeatingButtons();
+                    updateFullscreenButton();
+                }
+            };
+
+            // ===== Event Handlers =====
+            const handlePressStart = (e) => {
+                if (e.target === optionsBtn || e.target === seatingToggleBtn || e.target === fullscreenBtn || optionsPanel.contains(e.target) || seatingGrid.contains(e.target)) return;
+                e.preventDefault();
+                state.lastPressTime = Date.now();
+                state.longPressTimeout = setTimeout(() => {
+                    togglePause();
+                    state.longPressTimeout = null;
+                }, LONG_PRESS_MS);
+            };
+
+            const handlePressEnd = (e) => {
+                if (e.target === optionsBtn || e.target === seatingToggleBtn || e.target === fullscreenBtn || optionsPanel.contains(e.target) || seatingGrid.contains(e.target)) return;
+                e.preventDefault();
+                if (state.longPressTimeout) {
+                    clearTimeout(state.longPressTimeout);
+                    state.longPressTimeout = null;
+                    if (isAnyPanelOpen()) return;
+                    if (Date.now() - state.lastPressTime < LONG_PRESS_MS) {
+                        if (state.isPaused) togglePause();
+                        else startCountdown();
+                    }
+                }
+            };
+
+            // Options panel toggle with animation
+            const showOptionsPanel = () => {
+                seatingGrid.classList.remove('show'); // Hide seating grid
+                optionsPanel.classList.add('show');
+            };
+
+            // Show seating grid and hide options panel
+            const showSeatingGrid = () => {
+                optionsPanel.classList.remove('show'); // Hide options panel
+                seatingGrid.classList.add('show');
+            };
+
+            // Toggle seating grid visibility
+            const toggleSeatingGrid = () => {
+                if (seatingGrid.classList.contains('show')) {
+                    seatingGrid.classList.remove('show');
+                } else {
+                    showSeatingGrid();
+                }
+            };
+
+            // Load rotate45Toggle from state/localStorage
+            const loadRotate45Toggle = () => {
+                const saved = localStorage.getItem(STORAGE_KEY_ROTATE45);
+                state.rotate45Start = saved === 'true';
+                rotate45Toggle.checked = state.rotate45Start;
+            };
+
+            // Save rotate45Toggle to localStorage
+            const saveRotate45Toggle = (val) => {
+                localStorage.setItem(STORAGE_KEY_ROTATE45, val ? 'true' : 'false');
+            };
+
+            // ===== Bind Events =====
+
+            document.body.addEventListener('pointerdown', handlePressStart);
+            document.body.addEventListener('pointerup', handlePressEnd);
+            document.body.addEventListener('pointerleave', handlePressEnd);
+
+            optionsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showOptionsPanel();
+            });
+
+            seatingToggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleSeatingGrid();
+            });
+
+            fullscreenBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleFullscreen();
+            });
+
+            decreaseBtn.addEventListener('click', () => {
+                updateIntervalDisplay(state.startTime - 1);
+                saveIntervalToStorage();
+            });
+
+            increaseBtn.addEventListener('click', () => {
+                updateIntervalDisplay(state.startTime + 1);
+                saveIntervalToStorage();
+            });
+
+            // Player checkbox change handlers - apply immediately
+            playerCheckboxes.forEach((checkbox, index) => {
+                checkbox.addEventListener('change', () => {
+                    state.players[index] = checkbox.checked;
+                    savePlayerSelection();
+                    updatePlayerIndicator();
+                });
+            });
+
+            // Seating arrangement button event handlers
+            seatingBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const arrangement = btn.dataset.arrangement;
+                    setSeatingArrangement(arrangement);
+                });
+            });
+
+            okBtn.addEventListener('click', () => {
+                // All settings are now applied immediately, OK just closes the panel
+                optionsPanel.classList.remove('show');
+                seatingGrid.classList.remove('show');
+                if (!state.isPaused) startCountdown();
+            });
+
+            darkThemeToggle.addEventListener('change', () => {
+                applyTheme(darkThemeToggle.checked);
+            });
+
+            rotate45Toggle.addEventListener('change', () => {
+                state.rotate45Start = rotate45Toggle.checked;
+                saveRotate45Toggle(state.rotate45Start);
+                state.rotation = getInitialRotation();
+                if (state.players[4] || state.players[5]) {
+                    state.currentPlayer = 5;
+                } else {
+                    state.currentPlayer = 3;
+                }
+                nextActivePlayer();
+                updatePlayerLabelsDiagonal();
+                // Restart countdown to apply rotation change immediately if not paused
+                if (!state.isPaused) startCountdown();
+            });
+
+            // Close any open panel if clicking outside
+            document.body.addEventListener('click', (e) => {
+                const clickedOnButton = e.target === optionsBtn || e.target === seatingToggleBtn || e.target === fullscreenBtn;
+                const clickedInPanel = optionsPanel.contains(e.target) || seatingGrid.contains(e.target);
+
+                if (!clickedOnButton && !clickedInPanel) {
+                    optionsPanel.classList.remove('show');
+                    seatingGrid.classList.remove('show');
+                }
+            });
+
+            optionsPanel.addEventListener('click', e => e.stopPropagation());
+            seatingGrid.addEventListener('click', e => e.stopPropagation());
+
+            // Fullscreen change event listeners for different browsers
+            document.addEventListener('fullscreenchange', updateFullscreenButton);
+            document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
+            document.addEventListener('mozfullscreenchange', updateFullscreenButton);
+            document.addEventListener('MSFullscreenChange', updateFullscreenButton);
+
+            // Prevent context menu on timer (to avoid mobile search popup)
+            timerEl.addEventListener('contextmenu', e => {
+                e.preventDefault();
+            });
+
+            // Lock screen orientation to prevent autorotation
+            const lockOrientation = async () => {
+                try {
+                    if (screen.orientation && screen.orientation.lock) {
+                        // Lock to current orientation (portrait or landscape)
+                        const currentOrientation = screen.orientation.type;
+                        if (currentOrientation.includes('portrait')) {
+                            await screen.orientation.lock('portrait');
+                        } else if (currentOrientation.includes('landscape')) {
+                            await screen.orientation.lock('landscape');
+                        }
+                    }
+                } catch (error) {
+                    // Orientation lock is not supported or requires fullscreen
+                    console.log('Orientation lock not available:', error.message);
+                }
+            };
+
+            // Try to lock orientation on load
             lockOrientation();
-        }
-    });
 
-    // ===== Init =====
-    loadPlayerSelection();
+            // Also try to lock when entering fullscreen
+            document.addEventListener('fullscreenchange', () => {
+                if (isFullscreen()) {
+                    lockOrientation();
+                }
+            });
 
-    // Load saved theme or default to light
-    const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
-    applyTheme(savedTheme === 'dark');
+            // ===== Init =====
+            loadPlayerSelection();
 
-    loadRotate45Toggle();
-    loadSeatingArrangement();
-    
-    // Initialize fullscreen button
-    updateFullscreenButton();
+            // Load saved theme or default to light
+            const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
+            applyTheme(savedTheme === 'dark');
 
-    state.rotation = getInitialRotation();
-    state.currentPlayer = 3; // start from "before" player 0 to let nextActivePlayer move forward
+            loadRotate45Toggle();
+            loadSeatingArrangement();
 
-    // Load saved interval
-    const savedInterval = loadIntervalFromStorage();
-    updateIntervalDisplay(savedInterval);
+            // Initialize fullscreen button
+            updateFullscreenButton();
 
-    startCountdown();
-    togglePause();
-    
-    if (seatingOkBtn) {
-        seatingOkBtn.addEventListener('click', () => {
-            seatingGrid.classList.remove('show');
-        });
-    }
+            state.rotation = getInitialRotation();
+            if (state.players[4] || state.players[5]) {
+                // If E or F enabled, start from 0 rotation (E=down)
+                state.currentPlayer = 5;
+            } else {
+                // Start from 270 or 315 degrees (A=down)
+                state.currentPlayer = 3;
+            }
 
-    // On load, set correct arrows
-    updatePlayerLabelsDiagonal();
 
-    function updatePlayerLabelsDiagonal() {
-      const diagonal = rotate45Toggle.checked;
-      document.querySelector('label[for="player1"]').innerHTML = diagonal ? playerLabels[0].diagonal : playerLabels[0].normal;
-      document.querySelector('label[for="player2"]').innerHTML = diagonal ? playerLabels[1].diagonal : playerLabels[1].normal;
-      document.querySelector('label[for="player3"]').innerHTML = diagonal ? playerLabels[2].diagonal : playerLabels[2].normal;
-      document.querySelector('label[for="player4"]').innerHTML = diagonal ? playerLabels[3].diagonal : playerLabels[3].normal;
-    }
-})();
-</script>
+            // Load saved interval
+            const savedInterval = loadIntervalFromStorage();
+            updateIntervalDisplay(savedInterval);
+
+            startCountdown();
+            togglePause();
+
+            if (seatingOkBtn) {
+                seatingOkBtn.addEventListener('click', () => {
+                    seatingGrid.classList.remove('show');
+                });
+            }
+
+            // On load, set correct arrows
+            updatePlayerLabelsDiagonal();
+
+            function updatePlayerLabelsDiagonal() {
+                const diagonal = rotate45Toggle.checked;
+                document.querySelector('label[for="player1"]').innerHTML = diagonal ? playerLabels[0].diagonal : playerLabels[0].normal;
+                document.querySelector('label[for="player2"]').innerHTML = diagonal ? playerLabels[1].diagonal : playerLabels[1].normal;
+                document.querySelector('label[for="player3"]').innerHTML = diagonal ? playerLabels[2].diagonal : playerLabels[2].normal;
+                document.querySelector('label[for="player4"]').innerHTML = diagonal ? playerLabels[3].diagonal : playerLabels[3].normal;
+                document.querySelector('label[for="player5"]').innerHTML = diagonal ? playerLabels[4].diagonal : playerLabels[4].normal;
+                document.querySelector('label[for="player6"]').innerHTML = diagonal ? playerLabels[5].diagonal : playerLabels[5].normal;
+            }
+        })();
+    </script>
 </body>
+
 </html>
