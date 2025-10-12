@@ -50,7 +50,7 @@
         align-items: center;
     }
     #timer {
-        font-size: 80vmin;
+        font-size: 75vmin;
         color: var(--text-light);
         transition: color 0.2s ease;
         user-select: none;
@@ -60,7 +60,7 @@
         -ms-user-select: none;
     }
     #player-indicator {
-        font-size: 15vmin;
+        font-size: 18vmin;
         margin-top: -0.5em;
         opacity: 0.8;
         font-weight: bold;
@@ -68,23 +68,40 @@
         transition: color 0.2s ease;
         user-select: none; 
     }
-    #optionsBtn {
+    .top-btns {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1.2em;
         position: absolute;
         left: 50%;
         top: 2em;
         transform: translateX(-50%);
-        font-size: 2em;
-        padding: 0.5em 1em;
+        z-index: 10;
+    }
+    .top-btns button {
+        font-size: 1.8em;
+        padding: 0.4em 0.8em;
         background: var(--btn-bg-light);
         color: #fff;
         border: none;
         border-radius: 0.5em;
         cursor: pointer;
         display: none;
-        z-index: 10;
         transition: background-color 0.3s ease;
+        height: 2.6em;
+        min-width: 2.6em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     #optionsBtn:hover {
+        background-color: var(--btn-hover-light);
+    }
+    #seatingToggleBtn:hover {
+        background-color: var(--btn-hover-light);
+    }
+    #fullscreenBtn:hover {
         background-color: var(--btn-hover-light);
     }
     #optionsPanel {
@@ -97,7 +114,7 @@
         border-radius: 0.5em;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         padding: 2em;
-        min-width: 170px;
+        min-width: 220px;
         opacity: 0;
         pointer-events: none;
         transition:
@@ -110,45 +127,86 @@
         pointer-events: auto;
         transform: translate(-50%, -50%) translateY(0);
     }
+    
+    /* Section styling for better organization */
+    .options-section {
+        margin-bottom: 1.5em;
+    }
+    .options-section:last-child {
+        margin-bottom: 0;
+    }
+    .section-title {
+        font-weight: 600;
+        margin-bottom: 0.8em;
+        color: var(--text-light);
+        font-size: 0.9em;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
     .player-checkbox {
-        margin-bottom: 0.5em;
+        margin-bottom: 0.7em;
         display: flex;
         align-items: center;
     }
     .player-checkbox label {
-        margin-left: 0.5em;
+        margin-left: 0.7em;
+        min-height: 1.7em;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+    }
+    .arrow-label {
+        font-family: 'Consolas', 'Menlo', 'Monaco', 'Liberation Mono', monospace;
+        display: inline-block;
+        width: 1.2em;
+        text-align: center;
     }
 
     /* New plus/minus buttons container */
     #intervalControl {
-        margin-top: 1em;
+        margin-top: 0;
         display: flex;
         align-items: center;
-        gap: 0.5em;
+        gap: 0.7em;
+        justify-content: space-between;
     }
     #intervalControl label {
         user-select: none;
+        font-weight: 500;
+        min-width: 40px;
     }
     #decreaseInterval, #increaseInterval {
         font-size: 1.2em;
-        width: 2em;
-        height: 2em;
+        width: 2.2em;
+        height: 2.2em;
         border: 1px solid #ccc;
-        border-radius: 0.3em;
+        border-radius: 0.4em;
         background: white;
         color: #333;
         cursor: pointer;
         user-select: none;
-        transition: background-color 0.2s;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
     }
     #decreaseInterval:hover, #increaseInterval:hover {
         background-color: #eafaf1;
+        border-color: #2980b9;
+        transform: scale(1.05);
     }
     #intervalDisplay {
-        min-width: 40px;
+        min-width: 50px;
         text-align: center;
         font-weight: bold;
         user-select: none;
+        font-size: 1.1em;
+        padding: 0.2em 0.5em;
+        background: var(--bg-light);
+        border-radius: 0.3em;
+        border: 1px solid #eee;
     }
     body.dark #decreaseInterval, body.dark #increaseInterval {
         background: #333;
@@ -158,11 +216,20 @@
     body.dark #decreaseInterval:hover, body.dark #increaseInterval:hover {
         background-color: #1a5276;
         color: white;
+        border-color: #5dade2;
+    }
+    body.dark #intervalDisplay {
+        background: #333;
+        border-color: #555;
+        color: var(--text-dark);
+    }
+    body.dark .section-title {
+        color: var(--text-dark);
     }
 
     .options-actions {
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
         gap: 1em;
         margin-top: 2em;
     }
@@ -188,13 +255,22 @@
         background-color: var(--bg-dark);
         color: var(--text-dark);
     }
-    body.dark #timer {
-        /* color set dynamically via JS */
-    }
     body.dark #optionsBtn {
         background: var(--btn-bg-dark);
     }
+    body.dark #seatingToggleBtn {
+        background: var(--btn-bg-dark);
+    }
+    body.dark #fullscreenBtn {
+        background: var(--btn-bg-dark);
+    }
     body.dark #optionsBtn:hover {
+        background-color: var(--btn-hover-dark);
+    }
+    body.dark #seatingToggleBtn:hover {
+        background-color: var(--btn-hover-dark);
+    }
+    body.dark #fullscreenBtn:hover {
         background-color: var(--btn-hover-dark);
     }
     body.dark #optionsPanel {
@@ -212,6 +288,27 @@
         background: #4d1b1b;
     }
 
+    /* Instructions at bottom */
+    #instructions {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: 0 auto;
+        padding: 0.7em 0;
+        background: rgba(255,255,255,0.95);
+        z-index: 20;
+        border-top: 1px solid #eee;
+        text-align: center;
+        font-size: 1.2em;
+        transition: background 0.3s;
+    }
+    body.dark #instructions {
+        background: rgba(34,34,34,0.97);
+        border-top: 1px solid #444;
+        color: var(--text-dark);
+    }
+
     /* Player label colors */
     label[for="player1"] { color: #333; }
     label[for="player2"] { color: #e74c3c; }
@@ -222,15 +319,31 @@
     #seatingGrid {
         position: absolute;
         left: 50%;
-        top: 10em;
-        transform: translateX(-50%);
-        display: none;
+        top: 50%;
+        transform: translate(-50%, -50%) translateY(-10px);
+        background: var(--bg-light);
+        border: 1px solid #ccc;
+        border-radius: 0.5em;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 2em;
+        display: grid;
         grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr;
+        grid-template-rows: 1fr 1fr auto;
         gap: 0.5em;
         width: 200px;
         height: 160px;
         z-index: 10;
+        opacity: 0;
+        pointer-events: none;
+        transition:
+            opacity 0.3s ease,
+            transform 0.3s ease;
+    }
+    #seatingGrid.show {
+        display: grid;
+        opacity: 1;
+        pointer-events: auto;
+        transform: translate(-50%, -50%) translateY(0);
     }
     .seating-btn {
         font-size: 0.8em;
@@ -318,6 +431,25 @@
         color: #ddd;
         background: #333;
     }
+    /* Dark theme for seating grid panel */
+    body.dark #seatingGrid {
+        background: #333;
+        border-color: #555;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+    }
+
+    #seatingGrid .seating-ok-row {
+        grid-column: 1 / span 2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        margin-top: 1em;
+    }
+    #seatingOkBtn {
+      margin: 0;
+      color: #27ae60;
+    }
 </style>
 </head>
 <body>
@@ -325,11 +457,15 @@
     <div id="timer">40</div>
     <div id="player-indicator"></div>
 </div>
-    <div id="instructions" style="display:none; text-align:center; font-size:1.2em;">
+<div id="instructions" style="display:none;">
     ▶ krótkie naciśnięcie - start<br>
     ⏸ długie naciśnięcie - pauza
 </div>
-<button id="optionsBtn">Opcje</button>
+<div class="top-btns">
+    <button id="optionsBtn">Opcje</button>
+    <button id="seatingToggleBtn">Miejsca</button>
+    <button id="fullscreenBtn">⛶</button>
+</div>
 <div id="seatingGrid">
     <button class="seating-btn" data-arrangement="ABCD">
         <div class="btn-label">1</div>
@@ -371,43 +507,55 @@
             <div class="player-pos right">C</div>
         </div>
     </button>
+    <div class="seating-ok-row">
+        <button id="seatingOkBtn" class="icon-btn" title="OK" aria-label="Confirm">&#10003;</button>
+    </div>
 </div>
 <div id="optionsPanel">
-    <div class="player-checkbox">
-        <input type="checkbox" id="player1"><label for="player1">Gracz A (↓)</label>
-    </div>
-    <div class="player-checkbox">
-        <input type="checkbox" id="player2"><label for="player2">Gracz B (←)</label>
-    </div>
-    <div class="player-checkbox">
-        <input type="checkbox" id="player3"><label for="player3">Gracz C (↑)</label>
-    </div>
-    <div class="player-checkbox">
-        <input type="checkbox" id="player4"><label for="player4">Gracz D (→)</label>
-    </div>
-
-    <div id="intervalControl">
-        <label>Czas:</label>
-        <button type="button" id="decreaseInterval" aria-label="Decrease time">−</button>
-        <span id="intervalDisplay">40</span>
-        <button type="button" id="increaseInterval" aria-label="Increase time">+</button>
+    <div class="options-section">
+        <div class="section-title">Gracze</div>
+        <div class="player-checkbox">
+            <input type="checkbox" id="player1"><label for="player1">Gracz A <span class="arrow-label">(↓)</span></label>
+        </div>
+        <div class="player-checkbox">
+            <input type="checkbox" id="player2"><label for="player2">Gracz B <span class="arrow-label">(←)</span></label>
+        </div>
+        <div class="player-checkbox">
+            <input type="checkbox" id="player3"><label for="player3">Gracz C <span class="arrow-label">(↑)</span></label>
+        </div>
+        <div class="player-checkbox">
+            <input type="checkbox" id="player4"><label for="player4">Gracz D <span class="arrow-label">(→)</span></label>
+        </div>
     </div>
 
-    <div style="margin-top: 1em;">
-        <label>
-            <input type="checkbox" id="darkThemeToggle" />
-            Ciemny motyw
-        </label>
+    <div class="options-section">
+        <div class="section-title">Czas</div>
+        <div id="intervalControl">
+            <label>Czas:</label>
+            <button type="button" id="decreaseInterval" aria-label="Decrease time">−</button>
+            <span id="intervalDisplay">40</span>
+            <button type="button" id="increaseInterval" aria-label="Increase time">+</button>
+        </div>
     </div>
-    <div style="margin-top: 1em;">
-        <label>
-            <input type="checkbox" id="rotate45Toggle" />
-            Obróć o 45° 
-        </label>
+
+    <div class="options-section">
+        <div class="section-title">Ustawienia</div>
+        <div style="margin-bottom: 0.8em;">
+            <label>
+                <input type="checkbox" id="darkThemeToggle" />
+                Ciemny motyw
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" id="rotate45Toggle" />
+                Obróć o 45° 
+            </label>
+        </div>
     </div>
+
     <div class="options-actions">
         <button id="okBtn" class="icon-btn" title="OK" aria-label="Confirm">&#10003;</button>
-        <button id="cancelBtn" class="icon-btn" title="Cancel" aria-label="Cancel">&#10005;</button>
     </div>
 </div>
 <audio id="tickSound" src="sounds/tick.mp3" preload="auto"></audio>
@@ -458,6 +606,8 @@
     const timerEl = document.getElementById('timer');
     const playerIndicatorEl = document.getElementById('player-indicator');
     const optionsBtn = document.getElementById('optionsBtn');
+    const seatingToggleBtn = document.getElementById('seatingToggleBtn');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
     const seatingGrid = document.getElementById('seatingGrid');
     const seatingBtns = document.querySelectorAll('.seating-btn');
     const optionsPanel = document.getElementById('optionsPanel');
@@ -470,7 +620,6 @@
     const tickSound = document.getElementById('tickSound');
     const gongSound = document.getElementById('gongSound');
     const okBtn = document.getElementById('okBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
     const darkThemeToggle = document.getElementById('darkThemeToggle');
     const rotate45Toggle = document.getElementById('rotate45Toggle');
 
@@ -478,19 +627,117 @@
     const decreaseBtn = document.getElementById('decreaseInterval');
     const increaseBtn = document.getElementById('increaseInterval');
     const intervalDisplay = document.getElementById('intervalDisplay');
+    const seatingOkBtn = document.getElementById('seatingOkBtn');
 
     // ===== Helpers =====
     const playSound = (audio) => { audio.currentTime = 0; audio.play(); };
     const isValidInterval = (v) => Number.isInteger(v) && v >= MIN_INTERVAL && v <= MAX_INTERVAL;
     const isOptionsPanelOpen = () => optionsPanel.classList.contains('show');
-    const savePlayerSelection = () => state.players = playerCheckboxes.map(cb => cb.checked);
-    const loadPlayerSelection = () => playerCheckboxes.forEach((cb, i) => cb.checked = state.players[i]);
+    const isSeatingGridOpen = () => seatingGrid.classList.contains('show');
+    const isAnyPanelOpen = () => isOptionsPanelOpen() || isSeatingGridOpen();
+    // Save interval to localStorage
+    const saveIntervalToStorage = () => {
+        localStorage.setItem('countdown_timer_interval', state.startTime.toString());
+    };
+
+    // Load interval from localStorage
+    const loadIntervalFromStorage = () => {
+        const saved = localStorage.getItem('countdown_timer_interval');
+        if (saved && isValidInterval(parseInt(saved))) {
+            return parseInt(saved);
+        }
+        return 40; // default
+    };
+
+    const savePlayerSelection = () => {
+        state.players = playerCheckboxes.map(cb => cb.checked);
+        localStorage.setItem('countdown_timer_players', JSON.stringify(state.players));
+    };
+    const loadPlayerSelection = () => {
+        const saved = localStorage.getItem('countdown_timer_players');
+        if (saved) {
+            try {
+                state.players = JSON.parse(saved);
+            } catch (e) {
+                state.players = [true, true, true, true];
+            }
+        }
+        playerCheckboxes.forEach((cb, i) => cb.checked = state.players[i]);
+    };
+
+    // Fullscreen functionality
+    const isFullscreenSupported = () => {
+        return !!(document.fullscreenEnabled || 
+                 document.webkitFullscreenEnabled || 
+                 document.mozFullScreenEnabled ||
+                 document.msFullscreenEnabled);
+    };
+
+    const isFullscreen = () => {
+        return !!(document.fullscreenElement || 
+                 document.webkitFullscreenElement || 
+                 document.mozFullScreenElement ||
+                 document.msFullscreenElement);
+    };
+
+    const enterFullscreen = () => {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+            elem.mozRequestFullScreen();
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        }
+    };
+
+    const exitFullscreen = () => {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    };
+
+    const toggleFullscreen = () => {
+        if (!isFullscreenSupported()) {
+            alert('Fullscreen nie jest obsługiwany w tej przeglądarce');
+            return;
+        }
+        
+        if (isFullscreen()) {
+            exitFullscreen();
+        } else {
+            enterFullscreen();
+        }
+    };
+
+    const updateFullscreenButton = () => {
+        if (isFullscreenSupported()) {
+            fullscreenBtn.textContent = isFullscreen() ? '⯐' : '⛶';
+            fullscreenBtn.title = isFullscreen() ? 'Wyjdź z pełnego ekranu' : 'Pełny ekran';
+        } else {
+            fullscreenBtn.style.display = 'none';
+        }
+    };
 
     // Player labels
     const PLAYER_LABELS = ['A', 'B', 'C', 'D'];
+    const playerLabels = [
+      { normal: 'Gracz A <span class="arrow-label">(↓)</span>', diagonal: 'Gracz A <span class="arrow-label">(↙)</span>' },
+      { normal: 'Gracz B <span class="arrow-label">(←)</span>', diagonal: 'Gracz B <span class="arrow-label">(↖)</span>' },
+      { normal: 'Gracz C <span class="arrow-label">(↑)</span>', diagonal: 'Gracz C <span class="arrow-label">(↗)</span>' },
+      { normal: 'Gracz D <span class="arrow-label">(→)</span>', diagonal: 'Gracz D <span class="arrow-label">(↘)</span>' }
+    ];
 
     // Update the player indicator below the timer
-    const updatePlayerIndicator = () => {
+    const updatePlayerIndicator = () => {   
         // Only show for enabled players
         if (!state.players.some(Boolean)) {
             playerIndicatorEl.textContent = '';
@@ -500,7 +747,7 @@
         const currentSeating = SEATING_ARRANGEMENTS[state.seatingArrangement];
         const label = currentSeating[state.currentPlayer];
         const color = getPlayerColor();
-        playerIndicatorEl.textContent = label;
+        playerIndicatorEl.innerHTML = label;
         playerIndicatorEl.style.color = color;
         // Ensure timer and indicator always have the same color
         timerEl.style.color = color;
@@ -518,8 +765,29 @@
         if (SEATING_ARRANGEMENTS[arrangement]) {
             state.seatingArrangement = arrangement;
             localStorage.setItem(STORAGE_KEY_SEATING, arrangement);
-            updatePlayerIndicator();
+            
             updateSeatingButtons();
+            //reset rotation and current player
+            state.rotation = getInitialRotation() + 90;
+            state.currentPlayer = 0;
+
+            timerContainerEl.style.transform = `translate(-50%, -50%) rotate(${state.rotation}deg)`;
+            updatePlayerIndicator();
+            if (arrangement === 'ABCD') {
+
+            } else
+            if (arrangement === 'CBDA') {
+                nextActivePlayer();
+            } else
+            if (arrangement === 'CADB') {
+                
+            } else
+            if (arrangement === 'BADC') {
+                nextActivePlayer();
+                nextActivePlayer();
+            }
+
+
         }
     };
 
@@ -627,20 +895,23 @@
         state.isPaused = !state.isPaused;
         timerEl.style.opacity = state.isPaused ? 0.5 : 1;
         optionsBtn.style.display = state.isPaused ? "block" : "none";
-        seatingGrid.style.display = state.isPaused ? "grid" : "none";
+        seatingToggleBtn.style.display = state.isPaused ? "block" : "none";
+        fullscreenBtn.style.display = state.isPaused && isFullscreenSupported() ? "block" : "none";
         instructionsEl.style.display = state.isPaused ? "block" : "none";
         if (!state.isPaused) {
             optionsPanel.classList.remove("show");
+            seatingGrid.classList.remove("show");
         } else {
             setStartTime(state.startTime);
             savePlayerSelection();
             updateSeatingButtons();
+            updateFullscreenButton();
             }
         };
 
     // ===== Event Handlers =====
     const handlePressStart = (e) => {
-        if (e.target === optionsBtn || optionsPanel.contains(e.target) || seatingGrid.contains(e.target)) return;
+        if (e.target === optionsBtn || e.target === seatingToggleBtn || e.target === fullscreenBtn || optionsPanel.contains(e.target) || seatingGrid.contains(e.target)) return;
         e.preventDefault();
         state.lastPressTime = Date.now();
         state.longPressTimeout = setTimeout(() => {
@@ -650,12 +921,12 @@
     };
 
     const handlePressEnd = (e) => {
-        if (e.target === optionsBtn || optionsPanel.contains(e.target) || seatingGrid.contains(e.target)) return;
+        if (e.target === optionsBtn || e.target === seatingToggleBtn || e.target === fullscreenBtn || optionsPanel.contains(e.target) || seatingGrid.contains(e.target)) return;
         e.preventDefault();
         if (state.longPressTimeout) {
             clearTimeout(state.longPressTimeout);
             state.longPressTimeout = null;
-            if (isOptionsPanelOpen()) return;
+            if (isAnyPanelOpen()) return;
             if (Date.now() - state.lastPressTime < LONG_PRESS_MS) {
                 if (state.isPaused) togglePause();
                 else startCountdown();
@@ -665,7 +936,23 @@
 
     // Options panel toggle with animation
     const showOptionsPanel = () => {
+        seatingGrid.classList.remove('show'); // Hide seating grid
         optionsPanel.classList.add('show');
+    };
+
+    // Show seating grid and hide options panel
+    const showSeatingGrid = () => {
+        optionsPanel.classList.remove('show'); // Hide options panel
+        seatingGrid.classList.add('show');
+    };
+
+    // Toggle seating grid visibility
+    const toggleSeatingGrid = () => {
+        if (seatingGrid.classList.contains('show')) {
+            seatingGrid.classList.remove('show');
+        } else {
+            showSeatingGrid();
+        }
     };
 
     // Load rotate45Toggle from state/localStorage
@@ -691,12 +978,33 @@
         showOptionsPanel();
     });
 
+    seatingToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSeatingGrid();
+    });
+
+    fullscreenBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleFullscreen();
+    });
+
     decreaseBtn.addEventListener('click', () => {
         updateIntervalDisplay(state.startTime - 1);
+        saveIntervalToStorage();
     });
 
     increaseBtn.addEventListener('click', () => {
         updateIntervalDisplay(state.startTime + 1);
+        saveIntervalToStorage();
+    });
+
+    // Player checkbox change handlers - apply immediately
+    playerCheckboxes.forEach((checkbox, index) => {
+        checkbox.addEventListener('change', () => {
+            state.players[index] = checkbox.checked;
+            savePlayerSelection();
+            updatePlayerIndicator();
+        });
     });
 
     // Seating arrangement button event handlers
@@ -709,21 +1017,10 @@
     });
 
     okBtn.addEventListener('click', () => {
-        // startTime already updated by buttons
-        savePlayerSelection();
-
-        state.rotate45Start = rotate45Toggle.checked;
-        saveRotate45Toggle(state.rotate45Start);
-
+        // All settings are now applied immediately, OK just closes the panel
         optionsPanel.classList.remove('show');
+        seatingGrid.classList.remove('show');
         if (!state.isPaused) startCountdown();
-    });
-
-    cancelBtn.addEventListener('click', () => {
-        updateIntervalDisplay(state.startTime);
-        loadPlayerSelection();
-        loadRotate45Toggle();
-        optionsPanel.classList.remove('show');
     });
 
     darkThemeToggle.addEventListener('change', () => {
@@ -736,18 +1033,30 @@
         state.rotation = getInitialRotation();
         state.currentPlayer = 3;
         nextActivePlayer();
+        updatePlayerLabelsDiagonal();
         // Restart countdown to apply rotation change immediately if not paused
         if (!state.isPaused) startCountdown();
     });
 
-    // Close options panel if clicking outside
+    // Close any open panel if clicking outside
     document.body.addEventListener('click', (e) => {
-        if (isOptionsPanelOpen() && !optionsPanel.contains(e.target)) {
+        const clickedOnButton = e.target === optionsBtn || e.target === seatingToggleBtn || e.target === fullscreenBtn;
+        const clickedInPanel = optionsPanel.contains(e.target) || seatingGrid.contains(e.target);
+        
+        if (!clickedOnButton && !clickedInPanel) {
             optionsPanel.classList.remove('show');
+            seatingGrid.classList.remove('show');
         }
     });
 
     optionsPanel.addEventListener('click', e => e.stopPropagation());
+    seatingGrid.addEventListener('click', e => e.stopPropagation());
+
+    // Fullscreen change event listeners for different browsers
+    document.addEventListener('fullscreenchange', updateFullscreenButton);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
+    document.addEventListener('mozfullscreenchange', updateFullscreenButton);
+    document.addEventListener('MSFullscreenChange', updateFullscreenButton);
 
     // Prevent context menu on timer (to avoid mobile search popup)
     timerEl.addEventListener('contextmenu', e => {
@@ -763,15 +1072,36 @@
 
     loadRotate45Toggle();
     loadSeatingArrangement();
+    
+    // Initialize fullscreen button
+    updateFullscreenButton();
 
     state.rotation = getInitialRotation();
     state.currentPlayer = 3; // start from "before" player 0 to let nextActivePlayer move forward
 
-    updateIntervalDisplay(state.startTime);
+    // Load saved interval
+    const savedInterval = loadIntervalFromStorage();
+    updateIntervalDisplay(savedInterval);
 
     startCountdown();
     togglePause();
     
+    if (seatingOkBtn) {
+        seatingOkBtn.addEventListener('click', () => {
+            seatingGrid.classList.remove('show');
+        });
+    }
+
+    // On load, set correct arrows
+    updatePlayerLabelsDiagonal();
+
+    function updatePlayerLabelsDiagonal() {
+      const diagonal = rotate45Toggle.checked;
+      document.querySelector('label[for="player1"]').innerHTML = diagonal ? playerLabels[0].diagonal : playerLabels[0].normal;
+      document.querySelector('label[for="player2"]').innerHTML = diagonal ? playerLabels[1].diagonal : playerLabels[1].normal;
+      document.querySelector('label[for="player3"]').innerHTML = diagonal ? playerLabels[2].diagonal : playerLabels[2].normal;
+      document.querySelector('label[for="player4"]').innerHTML = diagonal ? playerLabels[3].diagonal : playerLabels[3].normal;
+    }
 })();
 </script>
 </body>
