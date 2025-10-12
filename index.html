@@ -1063,6 +1063,34 @@
         e.preventDefault();
     });
 
+    // Lock screen orientation to prevent autorotation
+    const lockOrientation = async () => {
+        try {
+            if (screen.orientation && screen.orientation.lock) {
+                // Lock to current orientation (portrait or landscape)
+                const currentOrientation = screen.orientation.type;
+                if (currentOrientation.includes('portrait')) {
+                    await screen.orientation.lock('portrait');
+                } else if (currentOrientation.includes('landscape')) {
+                    await screen.orientation.lock('landscape');
+                }
+            }
+        } catch (error) {
+            // Orientation lock is not supported or requires fullscreen
+            console.log('Orientation lock not available:', error.message);
+        }
+    };
+
+    // Try to lock orientation on load
+    lockOrientation();
+
+    // Also try to lock when entering fullscreen
+    document.addEventListener('fullscreenchange', () => {
+        if (isFullscreen()) {
+            lockOrientation();
+        }
+    });
+
     // ===== Init =====
     loadPlayerSelection();
 
