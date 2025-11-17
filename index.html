@@ -702,9 +702,9 @@
             // Maps player positions (↓←↑→) to player letters (A,B,C,D)
             const SEATING_ARRANGEMENTS = {
                 'ABCD': ['A', 'B', 'C', 'D'], // A=↓, B=←, C=↑, D=→
-                'CBDA': ['C', 'B', 'D', 'A'], // C=↓, B=←, D=↑, A=→  
-                'CADB': ['C', 'A', 'D', 'B'], // C=↓, A=←, D=↑, B=→
-                'BADC': ['B', 'A', 'D', 'C']  // B=↓, A=←, D=↑, C=→
+                'ACBD': ['A', 'C', 'B', 'D'], // C=↓, B=←, D=↑, A=→  
+                'BCAD': ['B', 'C', 'A', 'D'], // C=↓, A=←, D=↑, B=→
+                'CBAD': ['C', 'B', 'A', 'D']  // B=↓, A=←, D=↑, C=→
             };
 
             // Player colors for light and dark themes - indexed by letter A=0, B=1, C=2, D=3, E=4, F=5
@@ -918,13 +918,14 @@
                     if (arrangement === 'ABCD') {
 
                     } else
-                        if (arrangement === 'CBDA') {
-                            nextActivePlayer();
-                        } else
-                            if (arrangement === 'CADB') {
+                        if (arrangement === 'ACBD') {
 
+                        } else
+                            if (arrangement === 'BCAD') {
+
+                                nextActivePlayer();
                             } else
-                                if (arrangement === 'BADC') {
+                                if (arrangement === 'CBAD') {
                                     nextActivePlayer();
                                     nextActivePlayer();
                                 }
